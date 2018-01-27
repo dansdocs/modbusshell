@@ -1,0 +1,900 @@
+# 1 "main.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "main.c"
+
+
+
+
+
+
+
+            
+# 8 "main.c"
+#pragma message("No Target defined. Define one of: BUILD_FOR_WINDOWS, BUILD_FOR_LINUX BUILD_FOR_ARDUINO")
+# 8 "main.c"
+
+
+
+
+
+
+
+# 1 "C:/TDM-GCC-32/include/stdio.h" 1 3
+# 19 "C:/TDM-GCC-32/include/stdio.h" 3
+# 1 "C:/TDM-GCC-32/include/_mingw.h" 1 3
+# 32 "C:/TDM-GCC-32/include/_mingw.h" 3
+       
+# 33 "C:/TDM-GCC-32/include/_mingw.h" 3
+# 20 "C:/TDM-GCC-32/include/stdio.h" 2 3
+
+
+
+
+
+
+# 1 "C:/TDM-GCC-32/lib/gcc/mingw32/5.1.0/include/stddef.h" 1 3 4
+# 216 "C:/TDM-GCC-32/lib/gcc/mingw32/5.1.0/include/stddef.h" 3 4
+
+# 216 "C:/TDM-GCC-32/lib/gcc/mingw32/5.1.0/include/stddef.h" 3 4
+typedef unsigned int size_t;
+# 328 "C:/TDM-GCC-32/lib/gcc/mingw32/5.1.0/include/stddef.h" 3 4
+typedef short unsigned int wchar_t;
+# 357 "C:/TDM-GCC-32/lib/gcc/mingw32/5.1.0/include/stddef.h" 3 4
+typedef short unsigned int wint_t;
+# 27 "C:/TDM-GCC-32/include/stdio.h" 2 3
+
+# 1 "C:/TDM-GCC-32/lib/gcc/mingw32/5.1.0/include/stdarg.h" 1 3 4
+# 40 "C:/TDM-GCC-32/lib/gcc/mingw32/5.1.0/include/stdarg.h" 3 4
+typedef __builtin_va_list __gnuc_va_list;
+# 29 "C:/TDM-GCC-32/include/stdio.h" 2 3
+# 129 "C:/TDM-GCC-32/include/stdio.h" 3
+typedef struct _iobuf
+{
+ char* _ptr;
+ int _cnt;
+ char* _base;
+ int _flag;
+ int _file;
+ int _charbuf;
+ int _bufsiz;
+ char* _tmpfname;
+} FILE;
+# 154 "C:/TDM-GCC-32/include/stdio.h" 3
+extern __attribute__ ((__dllimport__)) FILE _iob[];
+# 169 "C:/TDM-GCC-32/include/stdio.h" 3
+ FILE* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fopen (const char*, const char*);
+ FILE* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) freopen (const char*, const char*, FILE*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fflush (FILE*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fclose (FILE*);
+
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) remove (const char*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) rename (const char*, const char*);
+ FILE* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) tmpfile (void);
+ char* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) tmpnam (char*);
+
+
+ char* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _tempnam (const char*, const char*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _rmtmp(void);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _unlink (const char*);
+
+
+ char* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) tempnam (const char*, const char*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) rmtmp(void);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) unlink (const char*);
+
+
+
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) setvbuf (FILE*, char*, int, size_t);
+
+ void __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) setbuf (FILE*, char*);
+# 204 "C:/TDM-GCC-32/include/stdio.h" 3
+extern int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) __mingw_fprintf(FILE*, const char*, ...);
+extern int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) __mingw_printf(const char*, ...);
+extern int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) __mingw_sprintf(char*, const char*, ...);
+extern int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) __mingw_snprintf(char*, size_t, const char*, ...);
+extern int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) __mingw_vfprintf(FILE*, const char*, __gnuc_va_list);
+extern int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) __mingw_vprintf(const char*, __gnuc_va_list);
+extern int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) __mingw_vsprintf(char*, const char*, __gnuc_va_list);
+extern int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) __mingw_vsnprintf(char*, size_t, const char*, __gnuc_va_list);
+# 293 "C:/TDM-GCC-32/include/stdio.h" 3
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fprintf (FILE*, const char*, ...);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) printf (const char*, ...);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) sprintf (char*, const char*, ...);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) vfprintf (FILE*, const char*, __gnuc_va_list);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) vprintf (const char*, __gnuc_va_list);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) vsprintf (char*, const char*, __gnuc_va_list);
+# 308 "C:/TDM-GCC-32/include/stdio.h" 3
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) __msvcrt_fprintf(FILE*, const char*, ...);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) __msvcrt_printf(const char*, ...);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) __msvcrt_sprintf(char*, const char*, ...);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) __msvcrt_vfprintf(FILE*, const char*, __gnuc_va_list);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) __msvcrt_vprintf(const char*, __gnuc_va_list);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) __msvcrt_vsprintf(char*, const char*, __gnuc_va_list);
+
+
+
+
+
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _snprintf (char*, size_t, const char*, ...);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _vsnprintf (char*, size_t, const char*, __gnuc_va_list);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _vscprintf (const char*, __gnuc_va_list);
+# 331 "C:/TDM-GCC-32/include/stdio.h" 3
+int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) snprintf (char *, size_t, const char *, ...);
+int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) vsnprintf (char *, size_t, const char *, __gnuc_va_list);
+
+int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) vscanf (const char * __restrict__, __gnuc_va_list);
+int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) vfscanf (FILE * __restrict__, const char * __restrict__,
+       __gnuc_va_list);
+int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) vsscanf (const char * __restrict__,
+       const char * __restrict__, __gnuc_va_list);
+
+
+
+
+
+
+
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fscanf (FILE*, const char*, ...);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) scanf (const char*, ...);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) sscanf (const char*, const char*, ...);
+
+
+
+
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fgetc (FILE*);
+ char* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fgets (char*, int, FILE*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fputc (int, FILE*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fputs (const char*, FILE*);
+ char* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) gets (char*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) puts (const char*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) ungetc (int, FILE*);
+
+
+
+
+
+
+
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _filbuf (FILE*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _flsbuf (int, FILE*);
+
+
+
+extern inline __attribute__((__gnu_inline__)) int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) getc (FILE* __F)
+{
+  return (--__F->_cnt >= 0)
+    ? (int) (unsigned char) *__F->_ptr++
+    : _filbuf (__F);
+}
+
+extern inline __attribute__((__gnu_inline__)) int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) putc (int __c, FILE* __F)
+{
+  return (--__F->_cnt >= 0)
+    ? (int) (unsigned char) (*__F->_ptr++ = (char)__c)
+    : _flsbuf (__c, __F);
+}
+
+extern inline __attribute__((__gnu_inline__)) int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) getchar (void)
+{
+  return (--(&_iob[0])->_cnt >= 0)
+    ? (int) (unsigned char) *(&_iob[0])->_ptr++
+    : _filbuf ((&_iob[0]));
+}
+
+extern inline __attribute__((__gnu_inline__)) int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) putchar(int __c)
+{
+  return (--(&_iob[1])->_cnt >= 0)
+    ? (int) (unsigned char) (*(&_iob[1])->_ptr++ = (char)__c)
+    : _flsbuf (__c, (&_iob[1]));}
+# 412 "C:/TDM-GCC-32/include/stdio.h" 3
+ size_t __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fread (void*, size_t, size_t, FILE*);
+ size_t __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fwrite (const void*, size_t, size_t, FILE*);
+
+
+
+
+
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fseek (FILE*, long, int);
+ long __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) ftell (FILE*);
+ void __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) rewind (FILE*);
+# 455 "C:/TDM-GCC-32/include/stdio.h" 3
+typedef long long fpos_t;
+
+
+
+
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fgetpos (FILE*, fpos_t*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fsetpos (FILE*, const fpos_t*);
+
+
+
+
+
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) feof (FILE*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) ferror (FILE*);
+# 480 "C:/TDM-GCC-32/include/stdio.h" 3
+ void __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) clearerr (FILE*);
+ void __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) perror (const char*);
+
+
+
+
+
+
+ FILE* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _popen (const char*, const char*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _pclose (FILE*);
+
+
+ FILE* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) popen (const char*, const char*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) pclose (FILE*);
+
+
+
+
+
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _flushall (void);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _fgetchar (void);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _fputchar (int);
+ FILE* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _fdopen (int, const char*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _fileno (FILE*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _fcloseall (void);
+ FILE* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _fsopen (const char*, const char*, int);
+
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _getmaxstdio (void);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _setmaxstdio (int);
+# 522 "C:/TDM-GCC-32/include/stdio.h" 3
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fgetchar (void);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fputchar (int);
+ FILE* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fdopen (int, const char*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fileno (FILE*);
+# 534 "C:/TDM-GCC-32/include/stdio.h" 3
+# 1 "C:/TDM-GCC-32/include/sys/types.h" 1 3
+# 21 "C:/TDM-GCC-32/include/sys/types.h" 3
+# 1 "C:/TDM-GCC-32/lib/gcc/mingw32/5.1.0/include/stddef.h" 1 3 4
+# 149 "C:/TDM-GCC-32/lib/gcc/mingw32/5.1.0/include/stddef.h" 3 4
+typedef int ptrdiff_t;
+# 22 "C:/TDM-GCC-32/include/sys/types.h" 2 3
+
+
+
+
+
+typedef long __time32_t;
+
+
+
+
+typedef long long __time64_t;
+# 45 "C:/TDM-GCC-32/include/sys/types.h" 3
+typedef __time32_t time_t;
+
+
+
+
+
+
+typedef long _off_t;
+
+
+typedef _off_t off_t;
+
+
+
+
+
+
+
+typedef unsigned int _dev_t;
+
+
+
+
+
+typedef _dev_t dev_t;
+
+
+
+
+
+
+typedef short _ino_t;
+
+
+typedef _ino_t ino_t;
+
+
+
+
+
+
+typedef int _pid_t;
+
+
+typedef _pid_t pid_t;
+
+
+
+
+
+
+typedef unsigned short _mode_t;
+
+
+typedef _mode_t mode_t;
+
+
+
+
+
+
+typedef int _sigset_t;
+
+
+typedef _sigset_t sigset_t;
+
+
+
+
+
+typedef int _ssize_t;
+
+
+typedef _ssize_t ssize_t;
+
+
+
+
+
+typedef long long fpos64_t;
+
+
+
+
+typedef long long off64_t;
+
+
+
+typedef unsigned int useconds_t;
+# 535 "C:/TDM-GCC-32/include/stdio.h" 2 3
+extern inline __attribute__((__gnu_inline__)) FILE* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fopen64 (const char* filename, const char* mode)
+{
+  return fopen (filename, mode);
+}
+
+int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fseeko64 (FILE*, off64_t, int);
+
+
+
+
+
+
+extern inline __attribute__((__gnu_inline__)) off64_t __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) ftello64 (FILE * stream)
+{
+  fpos_t pos;
+  if (fgetpos(stream, &pos))
+    return -1LL;
+  else
+   return ((off64_t) pos);
+}
+# 563 "C:/TDM-GCC-32/include/stdio.h" 3
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fwprintf (FILE*, const wchar_t*, ...);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) wprintf (const wchar_t*, ...);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _snwprintf (wchar_t*, size_t, const wchar_t*, ...);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) vfwprintf (FILE*, const wchar_t*, __gnuc_va_list);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) vwprintf (const wchar_t*, __gnuc_va_list);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _vsnwprintf (wchar_t*, size_t, const wchar_t*, __gnuc_va_list);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _vscwprintf (const wchar_t*, __gnuc_va_list);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fwscanf (FILE*, const wchar_t*, ...);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) wscanf (const wchar_t*, ...);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) swscanf (const wchar_t*, const wchar_t*, ...);
+ wint_t __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fgetwc (FILE*);
+ wint_t __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fputwc (wchar_t, FILE*);
+ wint_t __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) ungetwc (wchar_t, FILE*);
+
+
+
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) swprintf (wchar_t*, const wchar_t*, ...);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) vswprintf (wchar_t*, const wchar_t*, __gnuc_va_list);
+
+
+
+ wchar_t* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fgetws (wchar_t*, int, FILE*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fputws (const wchar_t*, FILE*);
+ wint_t __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) getwc (FILE*);
+ wint_t __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) getwchar (void);
+ wchar_t* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _getws (wchar_t*);
+ wint_t __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) putwc (wint_t, FILE*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _putws (const wchar_t*);
+ wint_t __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) putwchar (wint_t);
+ FILE* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _wfdopen(int, const wchar_t *);
+ FILE* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _wfopen (const wchar_t*, const wchar_t*);
+ FILE* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _wfreopen (const wchar_t*, const wchar_t*, FILE*);
+ FILE* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _wfsopen (const wchar_t*, const wchar_t*, int);
+ wchar_t* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _wtmpnam (wchar_t*);
+ wchar_t* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _wtempnam (const wchar_t*, const wchar_t*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _wrename (const wchar_t*, const wchar_t*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _wremove (const wchar_t*);
+ void __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _wperror (const wchar_t*);
+ FILE* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _wpopen (const wchar_t*, const wchar_t*);
+
+
+
+int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) snwprintf (wchar_t* s, size_t n, const wchar_t* format, ...);
+int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) vsnwprintf (wchar_t* s, size_t n, const wchar_t* format, __gnuc_va_list arg);
+
+
+
+
+
+int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) vwscanf (const wchar_t * __restrict__, __gnuc_va_list);
+int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) vfwscanf (FILE * __restrict__,
+         const wchar_t * __restrict__, __gnuc_va_list);
+int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) vswscanf (const wchar_t * __restrict__,
+         const wchar_t * __restrict__, __gnuc_va_list);
+# 625 "C:/TDM-GCC-32/include/stdio.h" 3
+ FILE* __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) wpopen (const wchar_t*, const wchar_t*);
+
+
+
+
+
+
+ wint_t __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _fgetwchar (void);
+ wint_t __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _fputwchar (wint_t);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _getw (FILE*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) _putw (int, FILE*);
+
+
+ wint_t __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fgetwchar (void);
+ wint_t __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) fputwchar (wint_t);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) getw (FILE*);
+ int __attribute__((__cdecl__)) __attribute__ ((__nothrow__)) putw (int, FILE*);
+# 16 "main.c" 2
+
+
+
+# 1 "./ucprintf.h" 1
+# 59 "./ucprintf.h"
+# 1 "C:/TDM-GCC-32/lib/gcc/mingw32/5.1.0/include/stdint.h" 1 3 4
+# 9 "C:/TDM-GCC-32/lib/gcc/mingw32/5.1.0/include/stdint.h" 3 4
+# 1 "C:/TDM-GCC-32/include/stdint.h" 1 3 4
+# 24 "C:/TDM-GCC-32/include/stdint.h" 3 4
+# 1 "C:/TDM-GCC-32/lib/gcc/mingw32/5.1.0/include/stddef.h" 1 3 4
+# 25 "C:/TDM-GCC-32/include/stdint.h" 2 3 4
+
+
+typedef signed char int8_t;
+typedef unsigned char uint8_t;
+typedef short int16_t;
+typedef unsigned short uint16_t;
+typedef int int32_t;
+typedef unsigned uint32_t;
+typedef long long int64_t;
+typedef unsigned long long uint64_t;
+
+
+typedef signed char int_least8_t;
+typedef unsigned char uint_least8_t;
+typedef short int_least16_t;
+typedef unsigned short uint_least16_t;
+typedef int int_least32_t;
+typedef unsigned uint_least32_t;
+typedef long long int_least64_t;
+typedef unsigned long long uint_least64_t;
+
+
+
+
+
+typedef signed char int_fast8_t;
+typedef unsigned char uint_fast8_t;
+typedef short int_fast16_t;
+typedef unsigned short uint_fast16_t;
+typedef int int_fast32_t;
+typedef unsigned int uint_fast32_t;
+typedef long long int_fast64_t;
+typedef unsigned long long uint_fast64_t;
+# 66 "C:/TDM-GCC-32/include/stdint.h" 3 4
+  typedef int intptr_t;
+# 75 "C:/TDM-GCC-32/include/stdint.h" 3 4
+  typedef unsigned int uintptr_t;
+
+
+
+
+typedef long long intmax_t;
+typedef unsigned long long uintmax_t;
+# 10 "C:/TDM-GCC-32/lib/gcc/mingw32/5.1.0/include/stdint.h" 2 3 4
+# 60 "./ucprintf.h" 2
+# 1 "C:/TDM-GCC-32/lib/gcc/mingw32/5.1.0/include/stdarg.h" 1 3 4
+# 98 "C:/TDM-GCC-32/lib/gcc/mingw32/5.1.0/include/stdarg.h" 3 4
+typedef __gnuc_va_list va_list;
+# 61 "./ucprintf.h" 2
+
+
+    
+# 63 "./ucprintf.h"
+   typedef uint8_t (*ucprintf_sendByteFnT)(uint8_t);
+
+    int ucprintf(ucprintf_sendByteFnT fn, const char *fmt, ...);
+    int ucprintf_vprintf(ucprintf_sendByteFnT fn, const char *fmt, va_list args);
+# 77 "./ucprintf.h"
+    void _ucprintf_itoa_base16(ucprintf_sendByteFnT fn, uint16_t val, uint8_t hideLeadingZeros, uint8_t numDisplayDigits) {
+        char dig[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+        char result[4] = {'0', '0', '0', '0'};
+        uint8_t dignum;
+
+        result[0] = dig[(val>>12) & 0x000F];
+        result[1] = dig[(val>>8) & 0x000F];
+        result[2] = dig[(val>>4) & 0x000F];
+        result[3] = dig[val & 0x000F];
+
+        dignum = 4 - numDisplayDigits;
+
+        if (hideLeadingZeros){
+            for(; (result[dignum] == '0') && (dignum < 4 -1); ++dignum)
+                ;
+        }
+
+        for(; dignum < 4; ++dignum) {
+            fn(result[dignum]);
+        }
+    }
+# 108 "./ucprintf.h"
+    void _ucprintf_itoa_base10(ucprintf_sendByteFnT fn, uint16_t val, uint8_t hideLeadingZeros, uint8_t numDisplayDigits) {
+
+
+        uint16_t bitnum, dignum;
+        char sum, carry, result[5] = "\x00\x00\x00\x00\x00";
+        const char *lookup;
+        static const char itoa_lookup[][5] = {
+            "\x00\x00\x00\x00\x01", "\x00\x00\x00\x00\x02", "\x00\x00\x00\x00\x04",
+            "\x00\x00\x00\x00\x08", "\x00\x00\x00\x01\x06", "\x00\x00\x00\x03\x02",
+            "\x00\x00\x00\x06\x04", "\x00\x00\x01\x02\x08", "\x00\x00\x02\x05\x06",
+            "\x00\x00\x05\x01\x02", "\x00\x01\x00\x02\x04", "\x00\x02\x00\x04\x08",
+            "\x00\x04\x00\x09\x06", "\x00\x08\x01\x09\x02", "\x01\x06\x03\x08\x04",
+            "\x03\x02\x07\x06\x08"};
+
+        for(bitnum = 0; bitnum < ((int) (sizeof (itoa_lookup) / sizeof (itoa_lookup)[0])); ++bitnum) {
+            if(val & (1 << bitnum)) {
+                carry = 0;
+                lookup = itoa_lookup[bitnum];
+                for(dignum = 5 -1; dignum != 0xFFFF; --dignum) {
+                    sum = result[dignum] + lookup[dignum] + carry;
+                    if(sum < 10) {
+                        carry = 0;
+                    } else {
+                        carry = 1;
+                        sum -= 10;
+                    }
+                    result[dignum] = sum;
+                }
+            }
+        }
+
+        dignum = 5 - numDisplayDigits;
+
+        if (hideLeadingZeros){
+            for(; !result[dignum] && dignum < 5 -1; ++dignum)
+                ;
+        }
+
+        for(; dignum < 5; ++dignum) {
+            fn(result[dignum] + '0');
+        }
+    }
+# 161 "./ucprintf.h"
+    uint8_t _ucprintf_escape(const char *fmt, uint8_t *i){
+
+        uint8_t temp = 0;
+        uint8_t a = 0;
+        uint8_t b = 0;
+        uint8_t c = 0;
+
+        if (fmt[*i] == '\\') {*i = *i + 1; return '\\';}
+        else if ((fmt[*i] == '\\') && (fmt[*i+1] == '\'')) {*i = *i + 1; return '\'';}
+        else if ((fmt[*i] == '\\') && (fmt[*i+1] == '\"')) {*i = *i + 1; return '\"';}
+        else if ((fmt[*i] == '\\') && (fmt[*i+1] == 't')) {*i = *i + 1; return '\t';}
+        else if ((fmt[*i] == '\\') && (fmt[*i+1] == 'r')) {*i = *i + 1; return '\r';}
+        else if ((fmt[*i] == '\\') && (fmt[*i+1] == 'n')) {*i = *i + 1; return '\n';}
+        else if ((fmt[*i] == '\\') && ((fmt[*i+1] >= '0') && (fmt[*i+1] <= '9'))) {
+            *i = *i + 1;
+            if ((fmt[*i+1] != 0) && ((fmt[*i+1] >= '0') && (fmt[*i+1] <= '9'))) {
+                if ((fmt[*i+2] != 0) && ((fmt[*i+2] >= '0') && (fmt[*i+2] <= '9'))) {
+                    c = fmt[*i+2]; b = fmt[*i+1]; a = fmt[*i];
+                    *i = *i + 2;
+                }
+                else {
+                    c = fmt[*i+1]; b = fmt[*i];
+                    *i = *i + 1;
+                }
+            }
+            else c = fmt[*i];
+
+            temp = (a-'0') << 6;
+            temp = (b-'0') << 3;
+            temp = (c-'0');
+            return temp;
+        }
+        else return 0x15;
+    }
+
+    void _ucprintf_processStr(ucprintf_sendByteFnT fn, char *s){
+
+        uint8_t b = s[0];
+        uint8_t i = 0;
+        uint8_t skip = 0;
+
+        while (b != '\0'){
+
+            if (b == '\\') {
+                b = _ucprintf_escape(s, &i);
+                if (b < 0x20) skip = 1;
+                i++;
+            }
+            if (!(skip)) fn(b);
+            else skip = 0;
+            i++;
+            b=s[i];
+        }
+    }
+
+    int ucprintf_vprintf(ucprintf_sendByteFnT fn, const char *fmt, va_list args){
+        uint8_t b = fmt[0];
+        uint8_t i = 0;
+        char *s;
+        uint8_t skip = 0;
+
+        while (b != '\0'){
+
+            if (b == '\\') {
+                b = _ucprintf_escape(fmt, &i);
+            }
+            else if ((b == '%') && (fmt[i+1] == '%')) i++;
+            else if ((b == '%') && (fmt[i+1] == 'c')) {
+                b = (uint8_t) 
+# 229 "./ucprintf.h" 3 4
+                             __builtin_va_arg(
+# 229 "./ucprintf.h"
+                             args
+# 229 "./ucprintf.h" 3 4
+                             ,
+# 229 "./ucprintf.h"
+                             int
+# 229 "./ucprintf.h" 3 4
+                             )
+# 229 "./ucprintf.h"
+                                              ;
+                if (b < 0x20) skip = 1;
+                i++;
+            }
+            else if ((b == '%') && (fmt[i+1] == 's')) {
+                s = 
+# 234 "./ucprintf.h" 3 4
+                   __builtin_va_arg(
+# 234 "./ucprintf.h"
+                   args
+# 234 "./ucprintf.h" 3 4
+                   ,
+# 234 "./ucprintf.h"
+                   char*
+# 234 "./ucprintf.h" 3 4
+                   )
+# 234 "./ucprintf.h"
+                                      ;
+                _ucprintf_processStr(fn, s);
+                i++;
+                skip = 1;
+            }
+            else if ((b == '%') && ((fmt[i+1] > '0') && (fmt[i+1] <= '5'))){
+              if (fmt[i+2] == 'u') {
+                  _ucprintf_itoa_base10(fn, 
+# 241 "./ucprintf.h" 3 4
+                                           __builtin_va_arg(
+# 241 "./ucprintf.h"
+                                           args
+# 241 "./ucprintf.h" 3 4
+                                           ,
+# 241 "./ucprintf.h"
+                                           int
+# 241 "./ucprintf.h" 3 4
+                                           )
+# 241 "./ucprintf.h"
+                                                            , 1, fmt[i+1]-'0');
+                  i = i+2;
+                  skip = 1;
+              }
+              else if ((fmt[i+2] == 'x') && (fmt[i+1] != '5')){
+                  _ucprintf_itoa_base16(fn, 
+# 246 "./ucprintf.h" 3 4
+                                           __builtin_va_arg(
+# 246 "./ucprintf.h"
+                                           args
+# 246 "./ucprintf.h" 3 4
+                                           ,
+# 246 "./ucprintf.h"
+                                           int
+# 246 "./ucprintf.h" 3 4
+                                           )
+# 246 "./ucprintf.h"
+                                                            , 1, fmt[i+1]-'0');
+                  i = i+2;
+                  skip = 1;
+              }
+            }
+            else if ((b == '%') && (fmt[i+1] == '0')) {
+                if ((fmt[i+2] > '0') && (fmt[i+2] <= '5')){
+                    if (fmt[i+3] == 'u') {
+                        _ucprintf_itoa_base10(fn, 
+# 254 "./ucprintf.h" 3 4
+                                                 __builtin_va_arg(
+# 254 "./ucprintf.h"
+                                                 args
+# 254 "./ucprintf.h" 3 4
+                                                 ,
+# 254 "./ucprintf.h"
+                                                 int
+# 254 "./ucprintf.h" 3 4
+                                                 )
+# 254 "./ucprintf.h"
+                                                                  , 0, fmt[i+2]-'0');
+                        i = i+3;
+                        skip = 1;
+                    }
+                    else if ((fmt[i+3] == 'x') && (fmt[i+2] != '5')){
+                        _ucprintf_itoa_base16(fn, 
+# 259 "./ucprintf.h" 3 4
+                                                 __builtin_va_arg(
+# 259 "./ucprintf.h"
+                                                 args
+# 259 "./ucprintf.h" 3 4
+                                                 ,
+# 259 "./ucprintf.h"
+                                                 int
+# 259 "./ucprintf.h" 3 4
+                                                 )
+# 259 "./ucprintf.h"
+                                                                  , 0, fmt[i+2]-'0');
+                        i = i+3;
+                        skip = 1;
+                    }
+                }
+            }
+
+            if (!(skip)) fn(b);
+            else skip = 0;
+            i++;
+            b=fmt[i];
+        }
+        return 0;
+   }
+
+   int ucprintf(ucprintf_sendByteFnT fn, const char *fmt, ...) {
+        va_list args;
+
+        
+# 277 "./ucprintf.h" 3 4
+       __builtin_va_start(
+# 277 "./ucprintf.h"
+       args
+# 277 "./ucprintf.h" 3 4
+       ,
+# 277 "./ucprintf.h"
+       fmt
+# 277 "./ucprintf.h" 3 4
+       )
+# 277 "./ucprintf.h"
+                          ;
+        ucprintf_vprintf(fn, fmt, args);
+        
+# 279 "./ucprintf.h" 3 4
+       __builtin_va_end(
+# 279 "./ucprintf.h"
+       args
+# 279 "./ucprintf.h" 3 4
+       )
+# 279 "./ucprintf.h"
+                   ;
+        return 0;
+    }
+# 20 "main.c" 2
+
+
+uint8_t sendByteExample(uint8_t c) {
+
+        putchar(c);
+
+    return 1;
+}
+
+
+
+
+
+int printerf(char *fmt, ...){
+    va_list args;
+    
+# 35 "main.c" 3 4
+   __builtin_va_start(
+# 35 "main.c"
+   args
+# 35 "main.c" 3 4
+   ,
+# 35 "main.c"
+   fmt
+# 35 "main.c" 3 4
+   )
+# 35 "main.c"
+                       ;
+    ucprintf_vprintf(&sendByteExample, fmt, args );
+    
+# 37 "main.c" 3 4
+   __builtin_va_end(
+# 37 "main.c"
+   args
+# 37 "main.c" 3 4
+   )
+# 37 "main.c"
+                 ;
+    return 0;
+}
+# 55 "main.c"
+int ppiou(char *fmt, ...) { va_list args; 
+# 55 "main.c" 3 4
+__builtin_va_start(
+# 55 "main.c"
+args
+# 55 "main.c" 3 4
+,
+# 55 "main.c"
+fmt
+# 55 "main.c" 3 4
+)
+# 55 "main.c"
+; ucprintf_vprintf(&sendByteExample, fmt, args ); 
+# 55 "main.c" 3 4
+__builtin_va_end(
+# 55 "main.c"
+args
+# 55 "main.c" 3 4
+)
+# 55 "main.c"
+; return 0; }
+
+int main()
+{
+    ucprintf_sendByteFnT fnSend;
+    fnSend = &sendByteExample;
+
+    ucprintf(fnSend, "OctalNull: \0 This Shouldnt appear because the null terminates the string\n");
+    ucprintf(fnSend, "Octal three char: \041-->should be an exclamation mark\n");
+    ucprintf(fnSend, "Octal two char: \41-->should be an exclamation mark\n");
+    ucprintf(fnSend, "Octal three char: \123-->should be capital S\n");
+    ucprintf(fnSend, "Percent5: %%, Tab: \t, quote: \', Double Quote: \", Backslash: \\");
+    ucprintf(fnSend, "CharacterArg: %c, OctalEscape: \115\n", 'a');
+    ucprintf(fnSend, "String eg:  %s  %c     %s", "stringy", 'j', "With octal escape: \107 --> should be letter G\n");
+
+    ucprintf(fnSend, "Should be 8: %5u\n", 8);
+    ucprintf(fnSend, "Should be 00132: %05u\n", 132);
+    ucprintf(fnSend, "Should be 65532: %05u\n", 65532);
+    ucprintf(fnSend, "Should be 0: %5u\n", 0);
+    ucprintf(fnSend, "Should be 0000: %04u\n", 0);
+
+    ucprintf(fnSend, "Should be BACD: %04x\n", 0xBACD);
+    ucprintf(fnSend, "Should be 001E: %04x\n", 0x001E);
+    ucprintf(fnSend, "Should be 01E: %03x\n", 0x001E);
+    ucprintf(fnSend, "Should be 1E: %02x\n", 0x001E);
+    ucprintf(fnSend, "Should be 0000: %04x\n", 0x0000);
+    ucprintf(fnSend, "Should be 1E: %4x\n", 0x001E);
+    ucprintf(fnSend, "Should be 0: %3x\n", 0x0000);
+
+
+
+    ucprintf(&sendByteExample, "Wrapping with a macro %s\n", "piggle sniggle");
+
+    printerf("wrapping with a function %3u\n", 226);
+
+    return 0;
+}

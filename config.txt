@@ -1,0 +1,13 @@
+// port that socket will use
+[port=3000]
+
+// a valid ip will mean use the port and try and connect to the address
+// listed as a client. No IP address means listen and accept incomping connections
+// as a server. 
+[address = 127.0.0.1 ]
+
+// logging levels: TRACE=0, DEBUG=1, INFO=2, WARN=3, ERROR=4, FATAL=5
+[logstderror=no]
+[logfile=yes]
+[loglevel=0]
+
