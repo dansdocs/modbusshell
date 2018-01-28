@@ -1,12 +1,9 @@
 /**
- * Copyright (c) 2017 rxi
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the MIT license. See end of file for details.
  * 
+ * Daniel 2018
  * 
- * Daniel - minor updates to create single header file style library (pre-pend log_ to fn names to minimise namespace collision risk).
- *
+ * Simple logging - redirect the output by providing a function with a printf style signature. 
+ * 
  * This is a single header file style library. See approach: 
  * https://github.com/RandyGaul/tinyheaders
  * https://github.com/nothings/stb/blob/master/docs/stb_howto.txt
@@ -21,7 +18,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#define LOG_VERSION "0.1.0"
+#define log_VERSION "0.1.0"
 
 typedef void (*log_LockFn)(void *udata, int lock);
 
@@ -165,26 +162,4 @@ void log_log(int level, const char *file, int line, const char *fmt, ...);
         log_unlock();
     }
 #endif // LOG_IMPLEMENTATION
-
-/*
- * Copyright (c) 2017 rxi
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- */
 
