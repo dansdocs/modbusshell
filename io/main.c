@@ -1,4 +1,4 @@
-/* Example of using ringbuf.h  */
+/* Example of using io.h  */
 
 
 // check that we have a target to build for. 
@@ -15,8 +15,8 @@
     #include <stdio.h>   // printf, putchar
 #endif
 
-#define RINGBUF_IMPLEMENTATION
-#include "./ringbuf.h"
+#define IO_IMPLEMENTATION
+#include "./io.h"
 
   
 
