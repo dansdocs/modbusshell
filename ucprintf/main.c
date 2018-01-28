@@ -26,7 +26,10 @@ uint8_t sendByteExample(uint8_t c) {
     return 1;
 }
 
-// The following are different examples of wrapping the functions. 
+// The following are different examples of wrapping the functions.
+// This is done if you want to have the same function signature as 
+// printf - and have the delegate function you pass in which sends the
+// bytes out wrapped so you don't have to carry it arround.  
        
 // an example of wrapping the function so it can be used like printf 
 // without needing to carry arround the sendByte function. 
@@ -37,24 +40,12 @@ int printerf(char *fmt, ...){
     va_end( args );
     return 0;
 }       
-     
-// This is a macro that creates wrapper functions like the function above. 
-// The idea is you can create a bunch of printf style functions which
-// but they use different functions to send the bytes out. So you could 
-// create printf_serial and printf_network etc. 
-
-#define CREATE_PRINTF_WRAPPED_FN(fn_name, sendByteFn)   \
-   int fn_name(char *fmt, ...) {                        \
-       va_list args;                                    \
-       va_start( args, fmt);                            \
-       ucprintf_vprintf(&sendByteFn, fmt, args );       \
-       va_end( args );                                  \
-       return 0;                                        \
-   }
    
-// using the function creating macro. The function name is the first parameter.    
-CREATE_PRINTF_WRAPPED_FN(printf_generated, sendByteExample)  
-CREATE_PRINTF_WRAPPED_FN(printf_generated2, sendByteExample) 
+// using the function creating macro. The function name is the first parameter.   
+// This will tie the sendByteExample function to the call. The macro creates the 
+// same thing as the version above. 
+ucprintf_CREATE_WRAPPED_FN(printf_generated, sendByteExample)  
+ucprintf_CREATE_WRAPPED_FN(printf_generated2, sendByteExample) 
     
 // A different way of wrapping the function - but its a plain macro so you can't 
 // get a function address to pass into other functions like you could with the 

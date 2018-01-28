@@ -64,7 +64,26 @@
     
     int ucprintf(ucprintf_sendByteFnT fn, const char *fmt, ...);
     int ucprintf_vprintf(ucprintf_sendByteFnT fn, const char *fmt, va_list args);
-    
+         
+    // Macro to create a wrapper function which lets tie the function 
+    // that sends out the bytes and not have to include it in every call. 
+    // Its a convenience feature only. EG say you have a 
+    // function of type ucprintf_sendByteFnT called sendByte and you want a 
+    // printf function which has the same call signature as normal printf 
+    // and uses sendByte to send out the bytes: 
+    // ucprintf_GENERATE_FN(examplePrintf, sendByte)
+    // You now have a function called examplePrintf which you can call 
+    // just like printf (you don't need to include sendByte as you would if 
+    // you used ucprintf directly).
+    #define ucprintf_CREATE_WRAPPED_FN(fn_name, sendByteFn) \
+       int fn_name(char *fmt, ...) {                        \
+           va_list args;                                    \
+           va_start( args, fmt);                            \
+           ucprintf_vprintf(&sendByteFn, fmt, args );       \
+           va_end( args );                                  \
+           return 0;                                        \
+       }
+        
 #endif // UCPRINTF_H
 
 //------------------------------------------------------------------------------------------
