@@ -1,8 +1,8 @@
 
 *.exe
-
-ucprintf/2
-
+**/*.exe
+**/main_*test
+**/2
 ucprintf/tt\.txt
 
-ucprintf/main_ucprintf_test
+
