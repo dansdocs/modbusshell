@@ -20,6 +20,7 @@
  * 
  * 
  *  %% --> %
+ *  %d   --> uint16_t displayed the same as per %5u
  *  %01u --> uint16_t displayed as decimal with one digit and leading zeros
  *  %02u --> uint16_t displayed as decimal with two digits and leading zeros
  *  %03u --> uint16_t displayed as decimal with three digits and leading zeros
@@ -76,7 +77,7 @@
     // just like printf (you don't need to include sendByte as you would if 
     // you used ucprintf directly).
     #define ucprintf_CREATE_WRAPPED_FN(fn_name, sendByteFn) \
-       int fn_name(char *fmt, ...) {                        \
+       int fn_name(const char *fmt, ...) {                  \
            va_list args;                                    \
            va_start( args, fmt);                            \
            ucprintf_vprintf(&sendByteFn, fmt, args );       \
@@ -280,7 +281,12 @@
                         skip = 1;                  
                     }
                 }
-            }            
+            }
+            else if ((b == '%') &&  (fmt[i+1] == 'd')){
+                _ucprintf_itoa_base10(fn, va_arg(args, int), 1, 5);    
+                i++;
+                skip = 1;                
+            }         
 
             if (!(skip)) fn(b);
             else skip = 0;

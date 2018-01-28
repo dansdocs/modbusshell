@@ -1,7 +1,7 @@
 /**
  * Daniel 2017
  * 
- * Basic Cursor location for windows command or VT100 style terminals 
+ * Basic Cursor location for windows command or ANSI/VT100 style terminals 
  * 
  * There are two relevent compile time defines:
  * If BUILD_FOR_WINDOWS is defined then the windows api will be used to locate the cursor
@@ -22,9 +22,8 @@
 #define CURSOR_H
 
     #include <stdint.h>  // uint8_t etc
-    #include "../ucprintf/ucprintf.h"
     
-    // Used to optionally provide a function which will then be used when sending VT100 commands
+    // Used to optionally provide a function which will be used when sending ANSI/VT100 commands
     typedef int (*cursor_sendCmdFnT)(const char *fmt, ...); 
     void cursor_setSendCmdFn(cursor_sendCmdFnT fn);    
 
