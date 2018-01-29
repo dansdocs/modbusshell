@@ -18,9 +18,18 @@
 #define IO_IMPLEMENTATION
 #include "./io.h"
 
-  
 
-int main()
-{
-    return 0; 
+
+
+int main() {
+   FILE *f;
+   f = fopen("test.txt", "a");    
+   
+   Io_file s;
+   io_file_init(f, &s);
+   
+   s.pushByte('H', &s);
+   
+   fclose(f);
+   return 0;
 }
