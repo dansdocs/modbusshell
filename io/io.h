@@ -11,7 +11,7 @@
     #include <stdio.h>   // FILE    
     
     typedef struct Io_file {
-        FILE *f;
+        FILE *_f;
         uint8_t (*pushByte)(uint8_t, struct Io_file*);
     } Io_file;
     
@@ -26,13 +26,13 @@
 #undef IO_IMPLEMENTATION
 
     uint8_t _io_file_pushByte(uint8_t b, Io_file *self){
-        fputc (b, self->f);
+        fputc (b, self->_f);
         return 1;
     }
 
     void io_file_init(FILE *f, Io_file *o){
         o->pushByte = &_io_file_pushByte;
-        o->f = f;
+        o->_f = f;
     }  
 
 #endif // IO_IMPLEMENTATION
