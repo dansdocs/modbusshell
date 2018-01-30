@@ -14,15 +14,16 @@
 # otherwise build main.c
 
 folder=${PWD##*/}
-dest="main_base_$folder"
-dest+="_test"
-#echo $dest
 
 if [[ -z $1 ]]; then
     echo; echo "Building main.c"; echo
+    dest="main_$folder"
+    dest+="_test"
     gcc ./main.c -DBUILD_FOR_LINUX -Wall -s -o2 -o $dest  
 else
     echo; echo "Building main_base.c"; echo
+    dest="main_base_$folder"
+    dest+="_test"    
     gcc ./main_base.c -DBUILD_FOR_LINUX -Wall -s -o2 -o $dest  
 fi
 
