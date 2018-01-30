@@ -19,17 +19,30 @@
 #include "./io.h"
 
 
+//io
+//printf
+//log
+
+void composed_log(uint8_t init, const char *fmt){
+    static Io_file iof;
+    static FILE *f;
+    uint8_t i;
+    
+    if (init){
+        f = fopen("test.txt", "a");  
+        io_file_init(f, &iof);  
+    }
+    else {
+        for(i=0; fmt[i] != '\0'; i++){
+            iof.pushByte(fmt[i], &iof);
+        }      
+        fclose(f);
+    }
+}
 
 
 int main() {
-   FILE *f;
-   f = fopen("test.txt", "a");    
-   
-   Io_file s;
-   io_file_init(f, &s);
-   
-   s.pushByte('H', &s);
-   
-   fclose(f);
+    composed_log(1, "pp");
+    composed_log(0, "its alive\n");
    return 0;
 }
