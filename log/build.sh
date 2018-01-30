@@ -9,12 +9,23 @@
 # Get folder name. This is onny done for the purposes of giving the executable
 # a nicer name, removing it and having the single gcc line (ie removing $dest and 
 # putting in whatever you want as the name) is fine
+#
+# If you have a parameter (any) then attempt to build the main_base.c (if it exists)
+# otherwise build main.c
 
 folder=${PWD##*/}
-dest="main_$folder"
+dest="main_base_$folder"
 dest+="_test"
 #echo $dest
 
-gcc ./main.c -DBUILD_FOR_LINUX -Wall -s -o2 -o $dest  
+if [[ -z $1 ]]; then
+    echo; echo "Building main.c"; echo
+    gcc ./main.c -DBUILD_FOR_LINUX -Wall -s -o2 -o $dest  
+else
+    echo; echo "Building main_base.c"; echo
+    gcc ./main_base.c -DBUILD_FOR_LINUX -Wall -s -o2 -o $dest  
+fi
+
+
 
 
