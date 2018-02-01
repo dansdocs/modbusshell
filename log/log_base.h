@@ -7,159 +7,67 @@
  * This is a single header file style library. See approach: 
  * https://github.com/RandyGaul/tinyheaders
  * https://github.com/nothings/stb/blob/master/docs/stb_howto.txt
- * To use include as normal - but one and only onec file, just before #include "./log.h" also put in #define LOG_IMPLEMENTATION 
- * You can #include "./log.h" in other c files as normal. 
+ * To use include as normal - but one and only onec file, just before #include "./log_base.h" also put in #define LOG_BASE_IMPLEMENTATION 
+ * You can #include "./log_base.h" in other c files as normal. 
  * 
  */
 
-#ifndef LOG_H
-#define LOG_H
+#ifndef LOG_BASE_H
+#define LOG_BASE_H
 
-#include <stdio.h>
-#include <stdarg.h>
+    #include <stdarg.h>  // va_list
 
-#define log_VERSION "0.1.0"
+    
+    typedef uint8_t (*Log_base_vprintf)(const char *fmt, va_list args);
+    //typedef uint8_t (*Log_base_log)(struct Log_base *s, uint8_t fid, uint8_t lvl, const char *fmt, ...);
 
-typedef void (*log_LockFn)(void *udata, int lock);
+    // Underscores mean its regarded as private and shouldn't be used outside this file. 
+    #define _LOG_BASE_NUMFILES 10
 
-enum { LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_FATAL };
+    typedef struct Log_base {
+        uint8_t _fid;                      // numeric   file identifier for this file
+        char *_cfid;                       // character file identifier for this file
+        uint8_t _lvl;                      // everything below this will be sent out. 
+        uint8_t _fids[_LOG_BASE_NUMFILES]; // list of fids to exclude from printing. 
+        Log_base_vprintf _vprintf;         // The function to use to send the data out. 
+        uint8_t (*log)(struct Log_base*, uint8_t, uint8_t, const char*, ...);  // function external things will use to log things.         
+    } Log_base;
 
-#define log_trace(...) log_log(LOG_TRACE, __FILE__, __LINE__, __VA_ARGS__)
-#define log_debug(...) log_log(LOG_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
-#define log_info(...)  log_log(LOG_INFO,  __FILE__, __LINE__, __VA_ARGS__)
-#define log_warn(...)  log_log(LOG_WARN,  __FILE__, __LINE__, __VA_ARGS__)
-#define log_error(...) log_log(LOG_ERROR, __FILE__, __LINE__, __VA_ARGS__)
-#define log_fatal(...) log_log(LOG_FATAL, __FILE__, __LINE__, __VA_ARGS__)
 
-//When writing the arduino version, it will be a NOP. 
-//#define log_debug(...) do{}while(0)
-
-void log_set_udata(void *udata);
-void log_set_lock(log_LockFn fn);
-void log_set_fp(FILE *fp);
-void log_set_level(int level);
-void log_set_quiet(int enable);
-
-void log_log(int level, const char *file, int line, const char *fmt, ...);
-
-#endif // LOG_H
+#endif // LOG_BASE_H
 
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
 
-#ifdef LOG_IMPLEMENTATION
-#undef LOG_IMPLEMENTATION
+#ifdef LOG_BASE_IMPLEMENTATION
+#undef LOG_BASE_IMPLEMENTATION
 
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <stdarg.h>
-    #include <string.h>
-    #include <time.h>
-    
-    static struct {
-        void *udata;
-        log_LockFn lock;
-        FILE *fp;
-        int level;
-        int quiet;
-    } log_L;
-
-
-    static const char *log_level_names[] = {
-        "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
-    };
-
-    #ifdef LOG_USE_COLOR
-        static const char *log_level_colors[] = {
-            "\x1b[94m", "\x1b[36m", "\x1b[32m", "\x1b[33m", "\x1b[31m", "\x1b[35m"
-        };
-    #endif
-
-
-    static void log_lock(void)   {
-      if (log_L.lock) {
-        log_L.lock(log_L.udata, 1);
-      }
-    }
-    
-    
-    static void log_unlock(void) {
-      if (log_L.lock) {
-        log_L.lock(log_L.udata, 0);
-      }
-    }
-    
-    
-    void log_set_udata(void *udata) {
-      log_L.udata = udata;
-    }
-
-
-    void log_set_lock(log_LockFn fn) {
-      log_L.lock = fn;
-    }
-    
-    
-    void log_set_fp(FILE *fp) {
-      log_L.fp = fp;
-    }
-    
-    
-    void log_set_level(int level) {
-      log_L.level = level;
-    }
-    
-    
-    void log_set_quiet(int enable) {
-      log_L.quiet = enable ? 1 : 0;
-    }
-    
-    
-    void log_log(int level, const char *file, int line, const char *fmt, ...) {
-        if (level < log_L.level) {
-            return;
+    uint8_t _log_log (struct Log_base *s, uint8_t fid, uint8_t lvl, const char *fmt, ...){
+        uint8_t i;    
+        va_list args;
+              
+        if (lvl <= s-> _lvl){
+            for (i=0; i<_LOG_BASE_NUMFILES; i++) if (fid == s-> _fids[i]) return 0;
+                va_start(args, fmt);
+                s-> _vprintf(fmt, args);
+                va_end(args);
         }
-    
-        /* Acquire lock */
-        log_lock();
-    
-        /* Get current time */
-        time_t t = time(NULL);
-        struct tm *lt = localtime(&t);
-    
-        /* Log to stderr */
-        if (!log_L.quiet) {
-            va_list args;
-            char buf[16];
-            buf[strftime(buf, sizeof(buf), "%H:%M:%S", lt)] = '\0';
-            #ifdef LOG_USE_COLOR
-                fprintf(
-                    stderr, "%s %s%-5s\x1b[0m \x1b[90m%s:%d:\x1b[0m ",
-                    buf, log_level_colors[level], log_level_names[level], file, line);
-            #else
-                fprintf(stderr, "%s %-5s %s:%d: ", buf, log_level_names[level], file, line);
-            #endif
-            va_start(args, fmt);
-            vfprintf(stderr, fmt, args);
-            va_end(args);
-            fprintf(stderr, "\n");
-        }
-
-        /* Log to file */
-        if (log_L.fp) {
-            va_list args;
-            char buf[32];
-            buf[strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", lt)] = '\0';
-            fprintf(log_L.fp, "%s %-5s %s:%d: ", buf, log_level_names[level], file, line);
-            va_start(args, fmt);
-            vfprintf(log_L.fp, fmt, args);
-            va_end(args);
-            fprintf(log_L.fp, "\n");
-        }
-
-        /* Release lock */
-        log_unlock();
+        return 0;
     }
-#endif // LOG_IMPLEMENTATION
+
+
+    void log_base_init(Log_base *s, Log_base_vprintf fn){
+        uint8_t i;
+        
+        s-> _cfid = "lob";  
+        s-> _fid = (s-> _cfid[0] << 2) + s-> _cfid[1] + s-> _cfid[2];  
+        s-> _vprintf = fn;
+        s -> log = &_log_log;
+        for (i=0; i<10; i++) s-> _fids[i] = 0;
+        s-> _lvl = 5; 
+        s-> log(s, s-> _fid, 1, "%2x: File id %s\n", s-> _fid, s-> _cfid);
+    }
+
+#endif // LOG_BASE_IMPLEMENTATION
 
