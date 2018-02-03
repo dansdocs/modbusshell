@@ -19,8 +19,6 @@
 
     typedef uint8_t (*Log_base_vprintf)(va_list args, const char *fmt, ...);
 
-    //typedef uint8_t (*Log_base_log)(struct Log_base *s, uint8_t fid, uint8_t lvl, const char *fmt, ...);
-
     // Underscores mean its regarded as private and shouldn't be used outside this file. 
     #define _LOG_BASE_NUMFILES 10
 
@@ -30,7 +28,7 @@
         uint8_t _lvl;                      // everything below this will be sent out. 
         uint8_t _fids[_LOG_BASE_NUMFILES]; // list of fids to exclude from printing. 
         Log_base_vprintf _vprintf;         // a function with similar to combined printf and vprintf 
-        uint8_t (*log)(struct Log_base*, uint8_t, uint8_t, const char*, ...);  // function external things will use to log things.         
+        uint8_t (*log)(struct Log_base*, va_list, uint8_t, uint8_t, const char*, ...);  // function external things will use to log things.         
     } Log_base;
 
 
@@ -43,16 +41,19 @@
 #ifdef LOG_BASE_IMPLEMENTATION
 #undef LOG_BASE_IMPLEMENTATION
 
-    uint8_t _log_log (struct Log_base *s, uint8_t fid, uint8_t lvl, const char *fmt, ...){
+    uint8_t _log_log (struct Log_base *s, va_list vaargs, uint8_t fid, uint8_t lvl, const char *fmt, ...){
         uint8_t i;    
         va_list args;
               
         if (lvl <= s-> _lvl){
             for (i=0; i<_LOG_BASE_NUMFILES; i++) if (fid == s-> _fids[i]) return 0;
             s-> _vprintf(0, "%2x: ", fid);
-            va_start(args, fmt);
-            s-> _vprintf(args, fmt, 0);
-            va_end(args);
+            if (vaargs != 0) s-> _vprintf(vaargs, fmt, 0);
+            else {
+                va_start(args, fmt);
+                s-> _vprintf(args, fmt, 0);
+                va_end(args);
+            }
         }
         return 0;
     }
@@ -67,7 +68,7 @@
         s -> log = &_log_log;
         for (i=0; i<10; i++) s-> _fids[i] = 0;
         s-> _lvl = 5; 
-        s-> log(s, s-> _fid, 1, "FileId: %s\n", s-> _cfid);
+        s-> log(s, 0, s-> _fid, 1, "FileId: %s\n", s-> _cfid);
     }
 
 #endif // LOG_BASE_IMPLEMENTATION

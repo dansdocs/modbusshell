@@ -18,6 +18,10 @@
     #include <stdarg.h>  // va_list
 #endif
 
+
+#define LOG_BASE_IMPLEMENTATION
+#include "./log_base.h"    
+
 uint8_t test_output_fn(uint8_t b){
     putchar(b);
     putchar(' ');
@@ -44,23 +48,37 @@ uint8_t test_vprintf(va_list vaargs, const char *fmt, ...){
 }
 
 
-#define LOG_BASE_IMPLEMENTATION
-#include "./log_base.h"       
+void logit(const char *fmt, ...){
+    static uint8_t firstRun = 1;
+    static Log_base logstruct;
+    va_list args; 
+    
+    if (firstRun) {
+        log_base_init(&logstruct, &test_vprintf);
+        firstRun = 0;
+    }
+    else {
+        va_start(args, fmt);
+        logstruct.log(&logstruct, args, 0xab, 1, fmt, 0);
+        va_end(args);
+    }
+}
+   
 
 
 
 int main()
 {
-    Log_base logb;
 
-    log_base_init(&logb, &test_vprintf);
+    //logb.log(&logb, 0xab, 1, "%2x blah %2x blah\n", 0x11, 0x22 );
     
-    logb.log(&logb, 0xab, 1, "%2x blah %2x blah\n", 0x11, 0x22 );
-    logb.log(&logb, 0xab, 1, " bbbbbbb blah\n");
+    logit("init");
+    logit("testd");
+    
     
     // example macro to reduce boilerplate
-    #define LOG_WARN(msg, ...) logb.log(&logb, 0xab, 1, msg, __VA_ARGS__)
-    LOG_WARN("piggle %2x \n", 0xa2);
+    //#define LOG_WARN(msg, ...) logb.log(&logb, 0xab, 1, msg, __VA_ARGS__)
+    //LOG_WARN("piggle %2x \n", 0xa2);
     
 
     return 0; 
