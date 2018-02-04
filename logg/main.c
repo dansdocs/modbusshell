@@ -1,6 +1,4 @@
-/* Example of using log_base.h  */
-
-
+/* Example of using logg.h  */
 
 // check that we have a target to build for. 
 #if defined(BUILD_FOR_WINDOWS) || defined(BUILD_FOR_LINUX) || defined(BUILD_FOR_ARDUINO)
@@ -20,7 +18,7 @@
 
 
 #define LOGG_IMPLEMENTATION
-#include "./log_base.h"    
+#include "./logg.h"    
 
 uint8_t test_output_fn(uint8_t b){
     putchar(b);
@@ -47,24 +45,15 @@ uint8_t test_vprintf(va_list vaargs, const char *fmt, ...){
     return 0;
 }
 
-
-
-
-
-
 int main()
-{
-
-    //logb.log(&logb, 0xab, 1, "%2x blah %2x blah\n", 0x11, 0x22 );
-    
+{    
     logg_init(&test_vprintf);
     logg(0, 0x2a, 1, "testd %2x\n", 0x73);
-    
-    
-    // example macro to reduce boilerplate
-    //#define LOG_WARN(msg, ...) logb.log(&logb, 0xab, 1, msg, __VA_ARGS__)
-    //LOG_WARN("piggle %2x \n", 0xa2);
-    
+        
+    // example macro to reduce boilerplate for a particular file.
+    #define LOGG_WARN(msg, ...) logg(0, 0x2a, 1, msg, __VA_ARGS__)
+
+    LOGG_WARN("piggle poggle %2x\n", 0x4f);
 
     return 0; 
 }
