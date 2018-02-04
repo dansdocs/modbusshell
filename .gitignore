@@ -8,3 +8,7 @@ ucprintf/tt\.txt
 
 
 io/test\.txt
+
+io/platform\.c
+
+io/platform\.h
