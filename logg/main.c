@@ -22,7 +22,7 @@
 
 uint8_t test_output_fn(uint8_t b){
     putchar(b);
-    putchar(' ');
+    //putchar(' ');
     return 0;
 }
 
@@ -47,13 +47,32 @@ uint8_t test_vprintf(va_list vaargs, const char *fmt, ...){
 
 int main()
 {    
-    logg_init(&test_vprintf);
-    logg(0, 0x2a, 1, "testd %2x\n", 0x73);
+    logg_init(&test_vprintf, 5);
+    
+    #define _MLO_CFID "mlo" 
+    #define _MLO_FID ((uint8_t)(('m' << 2) + 'l' + 'o'))
+    logg(_MLO_FID, 4, "FileId %s\n", _MLO_CFID);
+    
+    
+    // using logg function directly
+    logg(_MLO_FID, 1, "testd %2x\n", 0x73);
         
-    // example macro to reduce boilerplate for a particular file.
-    #define LOGG_WARN(msg, ...) logg(0, 0x2a, 1, msg, __VA_ARGS__)
+    // example macro for very minor boilerplate reduction
+    #define LOGG(lvl, msg, ...) logg( _MLO_FID, lvl, msg, __VA_ARGS__)
 
-    LOGG_WARN("piggle poggle %2x\n", 0x4f);
+    LOGG(4, "piggle poggle %2x\n", 0x4f);
+    
+    //block level 4 and 5 messages. 
+    logg_setLevel(3);
+    
+    LOGG(4, "attempt poggle %2x\n", 0x4e);
+    LOGG(3, "attempt poggle %2x\n", 0x4c);
+    
+    //block messages from ID _MLO_FID
+    logg_blockId(_MLO_FID);
+    LOGG(3, "attempt poggle %2x\n", 0x4b);
+    
+    
 
     return 0; 
 }
