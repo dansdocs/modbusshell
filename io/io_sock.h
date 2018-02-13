@@ -115,12 +115,6 @@
         int err;
         char rx;
         int nError;
-
-        //if (socketTimeout == 0) {
-		//  printf("No data recieved timeout, close socket...\r");	
-		//  if (connectToRemoteServer) closesocket(sockfd);
-	    //  else closesocket(servsockfd);
-	    //}
       
         if (connectToRemoteServer) n = recv(sockfd, &rx, 1, 0);
 	    else  n = recv(servsockfd, &rx, 1, 0);
@@ -157,7 +151,6 @@
             return 0;
         }
         else {
-		    //socketTimeout = STIMEOUTMS;  // recieved some data so reset the socket close timer. 
 		    *rxByte = (uint8_t)rx;
 		    return 1;
 	    }
