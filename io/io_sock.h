@@ -14,13 +14,16 @@
 
     typedef struct io_sock_s {
       int sockfd;
+      int portno;
+      int iResult;
       int servsockfd; 
       socklen_t clilen;
       struct sockaddr_in serv_addr;
       struct sockaddr_in cli_addr;
-      unsigned long on; // = 1;
-      uint8_t connectToRemoteServer;// = 0;
+      unsigned long on; 
+      uint8_t connectToRemoteServer;
       WSADATA wsaData;
+      char address[20];
     } io_sock_s;
         
 #endif // IO_SOCK_H
@@ -35,39 +38,35 @@
 
 #ifdef COMPILE_FOR_WINDOWS
 
-    #define platform_bzero(b,len) (memset((b), '\0', (len)), (void) 0)  
+    #define io_sock_bzero(b,len) (memset((b), '\0', (len)), (void) 0)  
   
     uint8_t platform_initComs(io_sock_s *s, uint16_t chConfig, char *adConfig, uint8_t useSavedConfigIfAvailable) {
           
-        int iResult, portno;
-        portno = (int) chConfig;
-        #define MAXBUFSIZE 20
-        char address[MAXBUFSIZE];
-        
+        s-> portno = (int) chConfig;        
         s-> on = 1;
         s-> connectToRemoteServer = 0;
         
-        strcpy(address, adConfig);      
-        //if (useSavedConfigIfAvailable) getConfig(&portno, address, MAXBUFSIZE);
+        strcpy(s-> address, adConfig);      
+        //if (useSavedConfigIfAvailable) getConfig(&portno, s-> address, MAXBUFSIZE);
         
-        if (address[0] == '\0') printf("No address. Act as server listing on port: %i\n", portno);
+        if (s-> address[0] == '\0') printf("No address. Act as server listing on port: %i\n", s-> portno);
         else {
-            printf("Connecting to server with address %s on port %i", address, portno);
+            printf("Connecting to server with address %s on port %i", s-> address, s-> portno);
         }
         
         
         // Initialize Winsock
-        iResult = WSAStartup(MAKEWORD(2,2), &(s-> wsaData));
-        if (iResult != 0) printf("WSAStartup failed with error: %d\n", iResult);
+        s-> iResult = WSAStartup(MAKEWORD(2,2), &(s-> wsaData));
+        if (s-> iResult != 0) printf("WSAStartup failed with error: %d\n", s-> iResult);
         s-> sockfd = socket(AF_INET, SOCK_STREAM, 0);
         if (s-> sockfd < 0) printf("ERROR opening socket");
-        platform_bzero((char *) &(s-> serv_addr), sizeof(s-> serv_addr));
+        io_sock_bzero((char *) &(s-> serv_addr), sizeof(s-> serv_addr));
         s-> serv_addr.sin_family = AF_INET;
-        s-> serv_addr.sin_port = htons(portno);
+        s-> serv_addr.sin_port = htons(s-> portno);
 
         // if address is a null string then we don't have server ip address to connect to 
         // so we are the server and need to listen for an incoming connection.       
-        if (address[0] == '\0'){
+        if (s-> address[0] == '\0'){
 		    s-> connectToRemoteServer = 0;
             s-> serv_addr.sin_addr.s_addr = INADDR_ANY;
             if (bind(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr)) < 0) {
@@ -93,7 +92,7 @@
 	    else {
 		    // we have an ip address for a server to connect to, so connect to it. 
 		    s-> connectToRemoteServer = 1;
-		    s-> serv_addr.sin_addr.s_addr = inet_addr(address);
+		    s-> serv_addr.sin_addr.s_addr = inet_addr(s-> address);
 		    if (connect(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr)) != 0 ){
                 printf("Connect error when connecting to server\r");
                 closesocket(s-> sockfd);
