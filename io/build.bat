@@ -21,14 +21,14 @@ IF "%1"=="" GOTO composed
     echo. 
     echo Building main_base.c
     echo.
-    gcc ./main_base.c -DBUILD_FOR_WINDOWS -Wall -s -o2 -o main_base_%sDirName%_test.exe   
+    gcc ./main_base.c -DBUILD_FOR_WINDOWS -Wall -s -o2 -o main_base_%sDirName%_test.exe -L./ -lws2_32   
 goto end
 
 :composed
     echo. 
     echo Building main.c
     echo.
-    gcc ./main.c -DBUILD_FOR_WINDOWS -Wall -s -o2 -o main_%sDirName%_test.exe  
+    gcc ./main.c -DBUILD_FOR_WINDOWS -Wall -s -o2 -o main_%sDirName%_test.exe -L./ -lws2_32  
 
 :end
 @echo on
