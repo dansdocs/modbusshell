@@ -131,7 +131,7 @@
 	    }
 	  
         if ((n == 0) || ((n == -1) && (nError != WSAEWOULDBLOCK))) {
-            printf("%i Disconnected - reconnecting \n", nError); 
+            printf("\n%i Disconnected - reconnecting \n", nError); 
             if (connectToRemoteServer) {
 		        closesocket(sockfd);
 			    WSACleanup();
@@ -149,16 +149,9 @@
 		    }
 		    else {
 			    closesocket(servsockfd);
+                closesocket(sockfd);
 			    WSACleanup();
-                WSAStartup(MAKEWORD(2,2), &wsaData);                
-                servsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-                if (servsockfd < 0) {
-		            printf("BBBERROR on trying to reconnect - exit program and restart\r");
-			    }
-                else {
-				    ioctlsocket(servsockfd, FIONBIO, &on);
-				    printf("Reconnected");
-			    }
+                platform_initComs(3000, "", 0);                
 		    }
               
             return 0;
