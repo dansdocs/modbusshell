@@ -14,12 +14,13 @@
 
 int main() {
     uint8_t bb;
+    io_sock_s sockst;
     
-    platform_initComs(3000, "", 0);
+    platform_initComs(&sockst, 3000, "", 0);
     
     printf("hello main\n");
     while(1){
-        if (platform_getByte(&bb)){
+        if (platform_getByte(&sockst, &bb)){
             printf("%c", bb);
         }
     }
