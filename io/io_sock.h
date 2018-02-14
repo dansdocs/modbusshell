@@ -107,7 +107,6 @@
     uint8_t platform_getByte(io_sock_s *s, uint8_t *rxByte){
 
         int n = 0;
-        int err;
         char rx;
         int nError;
       
@@ -121,28 +120,10 @@
 	  
         if ((n == 0) || ((n == -1) && (nError != WSAEWOULDBLOCK))) {
             printf("\n%i Disconnected - reconnecting \n", nError); 
-            if (s-> connectToRemoteServer) {
-		        closesocket(s-> sockfd);
-			    WSACleanup();
-			    WSAStartup(MAKEWORD(2,2), &(s-> wsaData));
-                s-> sockfd = socket(AF_INET, SOCK_STREAM, 0);
-			    err = connect(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr));
-		        if (err != 0 ){
-				    nError = WSAGetLastError();
-                    printf("ERROR on trying to reconnect3 - exit program and restart %i, %i\r", err, nError);
-		        }
-                else {
-				    ioctlsocket(s-> sockfd, FIONBIO, &(s-> on));  // set to non-blocking	 
-		     	    printf("Reconnected"); 
-		        }
-		    }
-		    else {
-			    closesocket(s-> servsockfd);
-                closesocket(s-> sockfd);
-			    WSACleanup();
-                platform_initComs(s, s-> portno, s-> address, s-> connectToRemoteServer);                
-		    }
-              
+			if (s-> connectToRemoteServer == 0) closesocket(s-> servsockfd);
+            closesocket(s-> sockfd);
+			WSACleanup();
+            platform_initComs(s, s-> portno, s-> address, s-> connectToRemoteServer);                
             return 0;
         }
         else {

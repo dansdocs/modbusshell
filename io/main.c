@@ -16,7 +16,7 @@ int main() {
     uint8_t bb;
     io_sock_s sockst;
     
-    platform_initComs(&sockst, 3000, "", 0);
+    platform_initComs(&sockst, 3000, "127.0.0.1", 0);
     
     printf("hello main\n");
     while(1){
