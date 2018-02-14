@@ -28,17 +28,26 @@ void wait( int seconds )
 
 
 int main() {
-    uint8_t bb;
-    io_sock_s sockst;
+    uint8_t b1;
+    uint8_t b2;
+    io_sock_s sock1;
+    io_sock_s sock2;
     
-    platform_initComs(&sockst, 3000, "127.0.0.1", 0);
+    platform_initComs(&sock1, 3000, "", 0);
+    platform_initComs(&sock2, 3001, "", 0);    
     
     while(1){
-        if (io_sock_getByte(&sockst, &bb)){
-            printf("%c", bb);
+        if (io_sock_getByte(&sock1, &b1)){
+            printf("%c", b1);
         }
-        wait(1);
-        io_sock_sendByte(&sockst, 'p');
+        io_sock_sendByte(&sock1, '1');
+        
+        if (io_sock_getByte(&sock2, &b2)){
+            printf("%c", b2);
+        }
+        io_sock_sendByte(&sock2, '2');      
+          
+        //wait(1);
     }
     
     return 0;
