@@ -18,11 +18,11 @@ int main() {
     
     platform_initComs(&sockst, 3000, "127.0.0.1", 0);
     
-    printf("hello main\n");
     while(1){
         if (platform_getByte(&sockst, &bb)){
             printf("%c", bb);
         }
+        platform_sendByte(&sockst, 'p');
     }
     
     return 0;

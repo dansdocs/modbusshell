@@ -135,7 +135,7 @@
   
     uint8_t platform_sendByte(io_sock_s *s, uint8_t txByte){
         int n = 0;
-        char tx = txByte;
+        char tx = txByte; 
       
         // this assumes that a closed connection will be addressed by the getByte function being called often
         // it also assumes that data that isn't sent will only be due to a closed connection, not because too
