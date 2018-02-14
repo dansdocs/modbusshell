@@ -104,7 +104,7 @@
 	    return 0;
     }
   
-    uint8_t platform_getByte(io_sock_s *s, uint8_t *rxByte){
+    uint8_t io_sock_getByte(io_sock_s *s, uint8_t *rxByte){
 
         int n = 0;
         char rx;
@@ -133,7 +133,7 @@
 	    return 0;
     }
   
-    uint8_t platform_sendByte(io_sock_s *s, uint8_t txByte){
+    uint8_t io_sock_sendByte(io_sock_s *s, uint8_t txByte){
         int n = 0;
         char tx = txByte; 
       

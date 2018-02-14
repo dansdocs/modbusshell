@@ -19,10 +19,10 @@ int main() {
     platform_initComs(&sockst, 3000, "127.0.0.1", 0);
     
     while(1){
-        if (platform_getByte(&sockst, &bb)){
+        if (io_sock_getByte(&sockst, &bb)){
             printf("%c", bb);
         }
-        platform_sendByte(&sockst, 'p');
+        io_sock_sendByte(&sockst, 'p');
     }
     
     return 0;
