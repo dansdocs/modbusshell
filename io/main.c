@@ -9,6 +9,21 @@
 #define IO_IMPLEMENTATION
 #include "./io.h"
 
+#ifdef COMPILE_FOR_WINDOWS
+    #include <windows.h>
+#else
+    #include <unistd.h>
+#endif
+
+void wait( int seconds )
+{   // Pretty crossplatform, both ALL POSIX compliant systems AND Windows
+    #ifdef COMPILE_FOR_WINDOWS
+        Sleep( 1000 * seconds );
+    #else
+        sleep( seconds );
+    #endif
+}
+
 
 
 
@@ -22,6 +37,7 @@ int main() {
         if (io_sock_getByte(&sockst, &bb)){
             printf("%c", bb);
         }
+        wait(1);
         io_sock_sendByte(&sockst, 'p');
     }
     
