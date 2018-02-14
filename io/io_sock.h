@@ -140,7 +140,7 @@
 			    closesocket(s-> servsockfd);
                 closesocket(s-> sockfd);
 			    WSACleanup();
-                platform_initComs(s, 3000, "", 0);                
+                platform_initComs(s, s-> portno, s-> address, s-> connectToRemoteServer);                
 		    }
               
             return 0;
