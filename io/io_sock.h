@@ -1,6 +1,8 @@
 /**
  * Daniel 2018
  *
+ * a server can only take a single connection - point to point. 
+ * while get and send data on an open port is non-blocking the connection/reconnection blocks. 
  *  
 **/
 
