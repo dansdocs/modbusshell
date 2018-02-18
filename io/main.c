@@ -30,17 +30,17 @@ void wait( int seconds )
 int main() {
     uint8_t b1;
     uint8_t b2;
-    uint8_t b3;
-    uint8_t b4;
+  //  uint8_t b3;
+  //  uint8_t b4;
     io_sock_s sock1;
     io_sock_s sock2;
-    io_sock_s sock3;
-    io_sock_s sock4;
+   // io_sock_s sock3;
+   // io_sock_s sock4;
     
     io_sock_initComs(&sock1, 3000, "");
     io_sock_initComs(&sock2, 3001, "");
-    io_sock_initComs(&sock3, 3002, "");
-    io_sock_initComs(&sock4, 3003, "");
+  //  io_sock_initComs(&sock3, 3002, "");
+  //  io_sock_initComs(&sock4, 3003, "");
 
     while(1){
         if (io_sock_getByte(&sock1, &b1)){
@@ -51,18 +51,18 @@ int main() {
             printf("%c", b2);
         }
         
-        if (io_sock_getByte(&sock3, &b3)){
-            printf("%c", b3);
-        }
-     
-        if (io_sock_getByte(&sock4, &b4)){
-            printf("%c", b4);
-        }
+   //     if (io_sock_getByte(&sock3, &b3)){
+   //         printf("%c", b3);
+   //     }
+   //  
+   //     if (io_sock_getByte(&sock4, &b4)){
+   //         printf("%c", b4);
+   //     }
                         
         io_sock_sendByte(&sock1, '1');
         io_sock_sendByte(&sock2, '2');   
-        io_sock_sendByte(&sock3, '3');
-        io_sock_sendByte(&sock4, '4');  
+   //     io_sock_sendByte(&sock3, '3');
+   //     io_sock_sendByte(&sock4, '4');  
         wait(1);  
         
           

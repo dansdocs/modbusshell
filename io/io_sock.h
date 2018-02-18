@@ -9,23 +9,37 @@
 #ifndef IO_SOCK_H
 #define IO_SOCK_H
 
-    #include <winsock2.h> 
-    #include <ws2tcpip.h>
+
+    #ifdef COMPILE_FOR_WINDOWS
+        #include <winsock2.h> 
+        #include <ws2tcpip.h>
+    #endif  
+    #ifdef COMPILE_FOR_LINUX
+        #include <sys/socket.h>
+        #include <netinet/in.h>  
+        #include <errno.h>     
+        #include <string.h>     // strcpy
+        #include <fcntl.h>      // fcntl
+        #include <unistd.h>     // close   
+        #include <arpa/inet.h>  // inet_addr  
+    #endif  
     #include <stdint.h>
     #include <stdio.h>
 
     typedef struct io_sock_s {
       int sockfd;
       int portno;
-      int iResult;
       int servsockfd; 
       socklen_t clilen;
       struct sockaddr_in serv_addr;
       struct sockaddr_in cli_addr;
-      unsigned long on; 
       uint8_t connectToRemoteServer;
-      WSADATA wsaData;
       char address[20];
+      #ifdef COMPILE_FOR_WINDOWS      
+          WSADATA wsaData;
+          unsigned long on; 
+          int iResult;          
+      #endif        
     } io_sock_s;
         
 #endif // IO_SOCK_H
@@ -38,15 +52,20 @@
 #undef IO_SOCK_IMPLEMENTATION
 
 
-#ifdef COMPILE_FOR_WINDOWS
+//#ifdef COMPILE_FOR_WINDOWS
 
     #define io_sock_bzero(b,len) (memset((b), '\0', (len)), (void) 0)  
   
     uint8_t io_sock_initComs(io_sock_s *s, uint16_t chConfig, char *adConfig) {
           
         s-> portno = (int) chConfig;        
-        s-> on = 1;
         s-> connectToRemoteServer = 0;
+        #ifdef COMPILE_FOR_WINDOWS
+            s-> on = 1;
+        #endif
+        #ifdef COMPILE_FOR_LINUX
+            int flags;
+        #endif
         
         strcpy(s-> address, adConfig);      
         
@@ -55,10 +74,11 @@
             printf("Connecting to server with address %s on port %i", s-> address, s-> portno);
         }
         
-        
-        // Initialize Winsock
-        s-> iResult = WSAStartup(MAKEWORD(2,2), &(s-> wsaData));
-        if (s-> iResult != 0) printf("WSAStartup failed with error: %d\n", s-> iResult);
+        #ifdef COMPILE_FOR_WINDOWS 
+            // Initialize Winsock
+            s-> iResult = WSAStartup(MAKEWORD(2,2), &(s-> wsaData));
+            if (s-> iResult != 0) printf("WSAStartup failed with error: %d\n", s-> iResult);
+        #endif  
         s-> sockfd = socket(AF_INET, SOCK_STREAM, 0);
         if (s-> sockfd < 0) printf("ERROR opening socket");
         io_sock_bzero((char *) &(s-> serv_addr), sizeof(s-> serv_addr));
@@ -72,23 +92,44 @@
             s-> serv_addr.sin_addr.s_addr = INADDR_ANY;
             if (bind(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr)) < 0) {
  	            printf("ERROR on binding\n");
-                closesocket(s-> sockfd);
-                WSACleanup();
+                #ifdef COMPILE_FOR_WINDOWS
+                    closesocket(s-> sockfd);
+                    WSACleanup();
+                #endif  
+                #ifdef COMPILE_FOR_LINUX 
+                    close(s-> sockfd);
+                #endif 
             }  
 
             // 5 is the maximum number of connections (backlog). 
             if (listen(s-> sockfd, 5) < 0){
 	            printf("Socket listen error\n");
-                closesocket(s-> sockfd);
-                WSACleanup();
+                #ifdef COMPILE_FOR_WINDOWS   
+                    closesocket(s-> sockfd);                              
+                    WSACleanup();
+                #endif      
+                #ifdef COMPILE_FOR_LINUX 
+                    close(s-> sockfd);
+                #endif                                
 	        }
             s-> clilen = sizeof(s-> cli_addr);
             s-> servsockfd = accept(s-> sockfd, (struct sockaddr *) &(s-> cli_addr), &(s-> clilen));
             if (s-> servsockfd < 0) {
 	             printf("ERROR on accept");
-		         WSACleanup();
+                 #ifdef COMPILE_FOR_WINDOWS                  
+		             WSACleanup();
+                 #endif                     
 	        }
-	        else ioctlsocket(s-> servsockfd, FIONBIO, &(s-> on));  // set to non-blocking	  
+	        else {
+                // set to non-blocking
+                #ifdef COMPILE_FOR_WINDOWS  
+                    ioctlsocket(s-> servsockfd, FIONBIO, &(s-> on));  
+                #endif   
+                #ifdef COMPILE_FOR_LINUX                
+                    flags = fcntl(s-> servsockfd, F_GETFL, 0);
+                    fcntl(s-> servsockfd, F_SETFL, flags & (~O_NONBLOCK));
+                #endif                     
+            }	  
 	    }
 	    else {
 		    // we have an ip address for a server to connect to, so connect to it. 
@@ -96,10 +137,24 @@
 		    s-> serv_addr.sin_addr.s_addr = inet_addr(s-> address);
 		    if (connect(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr)) != 0 ){
                 printf("Connect error when connecting to server\r");
-                closesocket(s-> sockfd);
-                WSACleanup();
+                #ifdef COMPILE_FOR_WINDOWS   
+                    closesocket(s-> sockfd);              
+                    WSACleanup();
+                #endif  
+                #ifdef COMPILE_FOR_LINUX 
+                    close(s-> sockfd);
+                #endif                   
 		    }
-		    else ioctlsocket(s-> sockfd, FIONBIO, &(s-> on));  // set to non-blocking	  
+		    else {
+                // set to non-blocking
+                #ifdef COMPILE_FOR_WINDOWS  
+                    ioctlsocket(s-> sockfd, FIONBIO, &(s-> on));  
+                #endif   
+                #ifdef COMPILE_FOR_LINUX                
+                    flags = fcntl(s-> sockfd, F_GETFL, 0);
+                    fcntl(s-> sockfd, F_SETFL, flags & (~O_NONBLOCK));
+                #endif                     
+            } 	  
         }
 
 	    return 0;
@@ -115,15 +170,40 @@
 	    else  n = recv(s-> servsockfd, &rx, 1, 0);
          	  
 	    if (n == -1) {
-            nError = WSAGetLastError(); 
-            if (nError == WSAEWOULDBLOCK) return 0;
+            #ifdef COMPILE_FOR_WINDOWS 
+                nError = WSAGetLastError(); 
+                if (nError == WSAEWOULDBLOCK) return 0;
+            #endif 
+            #ifdef COMPILE_FOR_LINUX
+                if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) return 0;
+            #endif 
 	    }
-	  
-        if ((n == 0) || ((n == -1) && (nError != WSAEWOULDBLOCK))) {
-            printf("\n%i Disconnected - reconnecting \n", nError); 
-			if (s-> connectToRemoteServer == 0) closesocket(s-> servsockfd);
-            closesocket(s-> sockfd);
-			WSACleanup();
+	    #ifdef COMPILE_FOR_WINDOWS 
+            if (nError != WSAEWOULDBLOCK) nError = 1;
+            else nError = 0;
+        #endif 
+        #ifdef COMPILE_FOR_LINUX 
+            if ((errno != EAGAIN) || (errno != EWOULDBLOCK)) nError = 1;
+            else nError = 0;
+        #endif 
+        if ((n == 0) || ((n == -1) && (nError))) {
+            printf("\n Disconnected - reconnecting \n"); 
+			if (s-> connectToRemoteServer == 0) {
+                #ifdef COMPILE_FOR_LINUX 
+                    close(s-> servsockfd);
+                #endif 
+                #ifdef COMPILE_FOR_WINDOWS 
+                    closesocket(s-> servsockfd);
+                #endif    
+            }
+            #ifdef COMPILE_FOR_WINDOWS 
+                closesocket(s-> sockfd);
+                WSACleanup();
+            #endif 
+            #ifdef COMPILE_FOR_LINUX 
+                close(s-> sockfd);
+            #endif 
+              
             io_sock_initComs(s, s-> portno, s-> address);                
             return 0;
         }
@@ -147,7 +227,7 @@
 	    return (uint8_t) n;
     }
 
-#endif  // COMPILE_FOR_WINDOWS
+//#endif  // COMPILE_FOR_WINDOWS
 
 
 #endif // IO_SOCK_IMPLEMENTATION
