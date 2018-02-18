@@ -165,6 +165,7 @@
 	    else  n = recv(s-> servsockfd, &rx, 1, 0);
          	  
 	    if (n == -1) {
+            printf("\n n = -1 \n");
             #ifdef COMPILE_FOR_WINDOWS 
                 nError = WSAGetLastError(); 
                 if (nError == WSAEWOULDBLOCK) return 0;
