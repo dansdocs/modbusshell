@@ -2,8 +2,8 @@
 
 
 // check that we have a target to build for. 
-#define COMPILE_FOR_WINDOWS
-//#define COMPILE_FOR_LINUX
+//#define COMPILE_FOR_WINDOWS
+#define COMPILE_FOR_LINUX
 
 
 #define IO_IMPLEMENTATION

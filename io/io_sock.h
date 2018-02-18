@@ -63,9 +63,6 @@
         #ifdef COMPILE_FOR_WINDOWS
             s-> on = 1;
         #endif
-        #ifdef COMPILE_FOR_LINUX
-            int flags;
-        #endif
         
         strcpy(s-> address, adConfig);      
         
@@ -126,8 +123,7 @@
                     ioctlsocket(s-> servsockfd, FIONBIO, &(s-> on));  
                 #endif   
                 #ifdef COMPILE_FOR_LINUX                
-                    flags = fcntl(s-> servsockfd, F_GETFL, 0);
-                    fcntl(s-> servsockfd, F_SETFL, flags & (~O_NONBLOCK));
+                    fcntl(s-> servsockfd, F_SETFL, O_NONBLOCK);
                 #endif                     
             }	  
 	    }
@@ -151,8 +147,7 @@
                     ioctlsocket(s-> sockfd, FIONBIO, &(s-> on));  
                 #endif   
                 #ifdef COMPILE_FOR_LINUX                
-                    flags = fcntl(s-> sockfd, F_GETFL, 0);
-                    fcntl(s-> sockfd, F_SETFL, flags & (~O_NONBLOCK));
+                    fcntl(s-> sockfd, F_SETFL, O_NONBLOCK);
                 #endif                     
             } 	  
         }
