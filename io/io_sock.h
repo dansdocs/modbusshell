@@ -42,14 +42,13 @@
 
     #define io_sock_bzero(b,len) (memset((b), '\0', (len)), (void) 0)  
   
-    uint8_t platform_initComs(io_sock_s *s, uint16_t chConfig, char *adConfig, uint8_t useSavedConfigIfAvailable) {
+    uint8_t io_sock_initComs(io_sock_s *s, uint16_t chConfig, char *adConfig) {
           
         s-> portno = (int) chConfig;        
         s-> on = 1;
         s-> connectToRemoteServer = 0;
         
         strcpy(s-> address, adConfig);      
-        //if (useSavedConfigIfAvailable) getConfig(&portno, s-> address, MAXBUFSIZE);
         
         if (s-> address[0] == '\0') printf("No address. Act as server listing on port: %i\n", s-> portno);
         else {
@@ -125,7 +124,7 @@
 			if (s-> connectToRemoteServer == 0) closesocket(s-> servsockfd);
             closesocket(s-> sockfd);
 			WSACleanup();
-            platform_initComs(s, s-> portno, s-> address, s-> connectToRemoteServer);                
+            io_sock_initComs(s, s-> portno, s-> address);                
             return 0;
         }
         else {

@@ -37,10 +37,10 @@ int main() {
     io_sock_s sock3;
     io_sock_s sock4;
     
-    platform_initComs(&sock1, 3000, "", 0);
-    platform_initComs(&sock2, 3001, "", 0);
-    platform_initComs(&sock3, 3002, "", 0);
-    platform_initComs(&sock4, 3003, "", 0);
+    io_sock_initComs(&sock1, 3000, "");
+    io_sock_initComs(&sock2, 3001, "");
+    io_sock_initComs(&sock3, 3002, "");
+    io_sock_initComs(&sock4, 3003, "");
 
     while(1){
         if (io_sock_getByte(&sock1, &b1)){
