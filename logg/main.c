@@ -45,20 +45,58 @@ uint8_t test_vprintf(va_list vaargs, const char *fmt, ...){
     return 0;
 }
 
+
+uint8_t test_output_fn2(uint8_t b){
+    putchar(b);
+    if  (b != '\n') putchar('.');
+    return 0;
+}
+
+uint8_t test_vprintf2(va_list vaargs, const char *fmt, ...){
+    va_list args; 
+    char buf[200];
+    uint8_t i=0;
+    buf[0] = '\0';
+    
+    if (vaargs != 0) vsprintf(buf, fmt, vaargs);
+    else {
+        va_start(args, fmt);
+        vsprintf(buf, fmt, args);
+        va_end(args);
+    }
+    while (buf[i] != '\0'){
+        test_output_fn2(buf[i]);
+        i++;
+    }
+    return 0;
+}
+
+
 int main()
 {    
-    logg_init(&test_vprintf, 5);
+    uint8_t handle;
+    uint8_t handle2;    
+    
+    handle = logg_init(&test_vprintf, 5);
+    printf("handle %i\n", handle);
+    
+    handle2 = logg_init(&test_vprintf2, 5);
+    printf("handle2 %i\n", handle2);
     
     #define _MLO_CFID "mlo" 
     #define _MLO_FID ((uint8_t)(('m' << 2) + 'l' + 'o'))
-    logg(_MLO_FID, 4, "FileId %s\n", _MLO_CFID);
+    logg(_MLO_FID, 4, handle, "FileId %s\n", _MLO_CFID);
     
     
     // using logg function directly
-    logg(_MLO_FID, 1, "testd %2x\n", 0x73);
+    logg(_MLO_FID, 1, handle, "testd %2x\n", 0x73);
+    
+    // using logg function directly with the other handle
+    logg(_MLO_FID, 1, handle2, "testd other handle %2x\n", 0x71); 
+    
         
     // example macro for very minor boilerplate reduction
-    #define LOGG(lvl, msg, ...) logg( _MLO_FID, lvl, msg, __VA_ARGS__)
+    #define LOGG(lvl, msg, ...) logg( _MLO_FID, lvl, handle, msg, __VA_ARGS__)
 
     LOGG(4, "piggle poggle %2x\n", 0x4f);
     
