@@ -73,30 +73,19 @@ uint8_t test_vprintf2(va_list vaargs, const char *fmt, ...){
 
 
 int main()
-{    
-    uint8_t handle;
-    uint8_t handle2;    
-    
-    handle = logg_init(&test_vprintf, 5);
-    printf("handle %i\n", handle);
-    
-    handle2 = logg_init(&test_vprintf2, 5);
-    printf("handle2 %i\n", handle2);
-    
+{        
     #define _MLO_CFID "mlo" 
     #define _MLO_FID ((uint8_t)(('m' << 2) + 'l' + 'o'))
-    logg(_MLO_FID, 4, handle, "FileId %s\n", _MLO_CFID);
-    
-    
-    // using logg function directly
-    logg(_MLO_FID, 1, handle, "testd %2x\n", 0x73);
-    
-    // using logg function directly with the other handle
-    logg(_MLO_FID, 1, handle2, "testd other handle %2x\n", 0x71); 
-    
+    logg(_MLO_FID, 4, &test_vprintf, "FileId %s\n", _MLO_CFID);
         
+    // using logg function directly
+    logg(_MLO_FID, 1, &test_vprintf, "testd %2x\n", 0x73);
+    
+    // using logg function directly with the other test_vprintf2
+    logg(_MLO_FID, 1, &test_vprintf2, "testd other test_vprintf2 %2x\n", 0x71); 
+            
     // example macro for very minor boilerplate reduction
-    #define LOGG(lvl, msg, ...) logg( _MLO_FID, lvl, handle, msg, __VA_ARGS__)
+    #define LOGG(lvl, msg, ...) logg( _MLO_FID, lvl, test_vprintf, msg, __VA_ARGS__)
 
     LOGG(4, "piggle poggle %2x\n", 0x4f);
     
@@ -110,7 +99,5 @@ int main()
     logg_blockId(_MLO_FID);
     LOGG(3, "attempt poggle %2x\n", 0x4b);
     
-    
-
     return 0; 
 }
