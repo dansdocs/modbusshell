@@ -11,8 +11,11 @@
 
 #ifdef COMPILE_FOR_WINDOWS
     #include <windows.h>
+    #include <stdio.h>
 #else
     #include <unistd.h>
+    #include <stdarg.h>  // va_start, va_end     
+    #include <stdio.h>    
 #endif
 
 void wait( int seconds )
@@ -24,6 +27,23 @@ void wait( int seconds )
     #endif
 }
 
+  
+void testlogfn(uint8_t fid, uint8_t lvl, const char *fmt, ...){
+    va_list args; 
+    char buf[200];
+    uint8_t i=0;
+    buf[0] = '\0';
+        
+    va_start(args, fmt);
+    vsprintf(buf, fmt, args);
+    va_end(args);
+
+    printf("%2x: ", fid);
+    while (buf[i] != '\0'){      
+         putchar(buf[i]);
+         i++;
+    }
+}
 
 
 
@@ -36,7 +56,9 @@ int main() {
     io_sock_s sock2;
    // io_sock_s sock3;
    // io_sock_s sock4;
-    
+   
+    io_sock_set_loggfn(&testlogfn);
+     
     io_sock_initComs(&sock1, 3000, "");
     io_sock_initComs(&sock2, 3001, "");
   //  io_sock_initComs(&sock3, 3002, "");
