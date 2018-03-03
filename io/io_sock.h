@@ -10,11 +10,11 @@
 #define IO_SOCK_H
 
 
-    #ifdef COMPILE_FOR_WINDOWS
+    #ifdef BUILD_FOR_WINDOWS
         #include <winsock2.h> 
         #include <ws2tcpip.h>
     #endif  
-    #ifdef COMPILE_FOR_LINUX
+    #ifdef BUILD_FOR_LINUX
         #include <sys/socket.h>
         #include <netinet/in.h>  
         #include <errno.h>     
@@ -35,7 +35,7 @@
       struct sockaddr_in cli_addr;
       uint8_t connectToRemoteServer;
       char address[20];
-      #ifdef COMPILE_FOR_WINDOWS      
+      #ifdef BUILD_FOR_WINDOWS      
           WSADATA wsaData;
           unsigned long on; 
           int iResult;          
@@ -73,7 +73,7 @@
           
         s-> portno = (int) chConfig;        
         s-> connectToRemoteServer = 0;
-        #ifdef COMPILE_FOR_WINDOWS
+        #ifdef BUILD_FOR_WINDOWS
             s-> on = 1;
         #endif
         
@@ -84,7 +84,7 @@
             _io_sock_logfn(_io_sock_fid, 4, "Connecting to server with address %s on port %i", s-> address, s-> portno);
         }
         
-        #ifdef COMPILE_FOR_WINDOWS 
+        #ifdef BUILD_FOR_WINDOWS 
             // Initialize Winsock
             s-> iResult = WSAStartup(MAKEWORD(2,2), &(s-> wsaData));
             if (s-> iResult != 0) _io_sock_logfn(_io_sock_fid, 4, "WSAStartup failed with error: %d\n", s-> iResult);
@@ -102,11 +102,11 @@
             s-> serv_addr.sin_addr.s_addr = INADDR_ANY;
             if (bind(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr)) < 0) {
  	            _io_sock_logfn(_io_sock_fid, 4, "ERROR on binding\n");
-                #ifdef COMPILE_FOR_WINDOWS
+                #ifdef BUILD_FOR_WINDOWS
                     closesocket(s-> sockfd);
                     WSACleanup();
                 #endif  
-                #ifdef COMPILE_FOR_LINUX 
+                #ifdef BUILD_FOR_LINUX 
                     close(s-> sockfd);
                 #endif 
             }  
@@ -114,11 +114,11 @@
             // 5 is the maximum number of connections (backlog). 
             if (listen(s-> sockfd, 5) < 0){
 	            _io_sock_logfn(_io_sock_fid, 4, "Socket listen error\n");
-                #ifdef COMPILE_FOR_WINDOWS   
+                #ifdef BUILD_FOR_WINDOWS   
                     closesocket(s-> sockfd);                              
                     WSACleanup();
                 #endif      
-                #ifdef COMPILE_FOR_LINUX 
+                #ifdef BUILD_FOR_LINUX 
                     close(s-> sockfd);
                 #endif                                
 	        }
@@ -126,16 +126,16 @@
             s-> servsockfd = accept(s-> sockfd, (struct sockaddr *) &(s-> cli_addr), &(s-> clilen));
             if (s-> servsockfd < 0) {
 	             _io_sock_logfn(_io_sock_fid, 4, "ERROR on accept");
-                 #ifdef COMPILE_FOR_WINDOWS                  
+                 #ifdef BUILD_FOR_WINDOWS                  
 		             WSACleanup();
                  #endif                     
 	        }
 	        else {
                 // set to non-blocking
-                #ifdef COMPILE_FOR_WINDOWS  
+                #ifdef BUILD_FOR_WINDOWS  
                     ioctlsocket(s-> servsockfd, FIONBIO, &(s-> on));  
                 #endif   
-                #ifdef COMPILE_FOR_LINUX                
+                #ifdef BUILD_FOR_LINUX                
                     fcntl(s-> servsockfd, F_SETFL, O_NONBLOCK);
                 #endif                     
             }	  
@@ -146,20 +146,20 @@
 		    s-> serv_addr.sin_addr.s_addr = inet_addr(s-> address);
 		    if (connect(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr)) != 0 ){
                 _io_sock_logfn(_io_sock_fid, 4, "Connect error when connecting to server\n");
-                #ifdef COMPILE_FOR_WINDOWS   
+                #ifdef BUILD_FOR_WINDOWS   
                     closesocket(s-> sockfd);              
                     WSACleanup();
                 #endif  
-                #ifdef COMPILE_FOR_LINUX 
+                #ifdef BUILD_FOR_LINUX 
                     close(s-> sockfd);
                 #endif                   
 		    }
 		    else {
                 // set to non-blocking
-                #ifdef COMPILE_FOR_WINDOWS  
+                #ifdef BUILD_FOR_WINDOWS  
                     ioctlsocket(s-> sockfd, FIONBIO, &(s-> on));  
                 #endif   
-                #ifdef COMPILE_FOR_LINUX                
+                #ifdef BUILD_FOR_LINUX                
                     fcntl(s-> sockfd, F_SETFL, O_NONBLOCK);
                 #endif                     
             } 	  
@@ -184,37 +184,37 @@
 	    else  n = recv(s-> servsockfd, &rx, 1, 0);
          	  
 	    if (n == -1) {
-            #ifdef COMPILE_FOR_WINDOWS 
+            #ifdef BUILD_FOR_WINDOWS 
                 nError = WSAGetLastError(); 
                 if (nError == WSAEWOULDBLOCK) return 0;
             #endif 
-            #ifdef COMPILE_FOR_LINUX
+            #ifdef BUILD_FOR_LINUX
                 if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) return 0;
             #endif 
 	    }
-	    #ifdef COMPILE_FOR_WINDOWS 
+	    #ifdef BUILD_FOR_WINDOWS 
             if (nError != WSAEWOULDBLOCK) nError = 1;
             else nError = 0;
         #endif 
-        #ifdef COMPILE_FOR_LINUX 
+        #ifdef BUILD_FOR_LINUX 
             if ((errno != EAGAIN) || (errno != EWOULDBLOCK)) nError = 1;
             else nError = 0;
         #endif 
         if ((n == 0) || ((n == -1) && (nError))) {
             _io_sock_logfn(_io_sock_fid, 4, "\n Disconnected - reconnecting \n"); 
 			if (s-> connectToRemoteServer == 0) {
-                #ifdef COMPILE_FOR_LINUX 
+                #ifdef BUILD_FOR_LINUX 
                     close(s-> servsockfd);
                 #endif 
-                #ifdef COMPILE_FOR_WINDOWS 
+                #ifdef BUILD_FOR_WINDOWS 
                     closesocket(s-> servsockfd);
                 #endif    
             }
-            #ifdef COMPILE_FOR_WINDOWS 
+            #ifdef BUILD_FOR_WINDOWS 
                 closesocket(s-> sockfd);
                 WSACleanup();
             #endif 
-            #ifdef COMPILE_FOR_LINUX 
+            #ifdef BUILD_FOR_LINUX 
                 close(s-> sockfd);
             #endif 
               

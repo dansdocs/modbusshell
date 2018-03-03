@@ -8,7 +8,8 @@
 #define IO_H
 
  
-    #include "./io_sock.h"   
+    #include "./io_sock.h" 
+    #include "./io_file.h"  
     
 #endif // IO_H
 
@@ -24,6 +25,8 @@
 
     #define IO_SOCK_IMPLEMENTATION
     #include "./io_sock.h"   
+    #define IO_FILE_IMPLEMENTATION
+    #include "./io_file.h"   
 
 #endif // IO_IMPLEMENTATION
 

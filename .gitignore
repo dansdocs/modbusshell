@@ -12,3 +12,5 @@ io/test\.txt
 io/platform\.c
 
 io/platform\.h
+
+io/log\.txt

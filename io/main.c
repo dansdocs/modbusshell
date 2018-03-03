@@ -2,14 +2,14 @@
 
 
 // check that we have a target to build for. 
-//#define COMPILE_FOR_WINDOWS
-#define COMPILE_FOR_LINUX
+//#define BUILD_FOR_WINDOWS
+//#define BUILD_FOR_LINUX
 
 
 #define IO_IMPLEMENTATION
 #include "./io.h"
 
-#ifdef COMPILE_FOR_WINDOWS
+#ifdef BUILD_FOR_WINDOWS
     #include <windows.h>
     #include <stdio.h>
 #else
@@ -20,7 +20,7 @@
 
 void wait( int seconds )
 {   // Pretty crossplatform, both ALL POSIX compliant systems AND Windows
-    #ifdef COMPILE_FOR_WINDOWS
+    #ifdef BUILD_FOR_WINDOWS
         Sleep( 1000 * seconds );
     #else
         sleep( seconds );
@@ -63,6 +63,8 @@ int main() {
     io_sock_initComs(&sock2, 3001, "");
   //  io_sock_initComs(&sock3, 3002, "");
   //  io_sock_initComs(&sock4, 3003, "");
+  
+   io_file_sendByte('c');
 
     while(1){
         if (io_sock_getByte(&sock1, &b1)){
