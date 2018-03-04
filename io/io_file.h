@@ -2,6 +2,8 @@
  * Daniel 2018
  *
  * file i/o 
+ * 
+ * Todo: take in config filename.
  *  
 **/
 
@@ -38,11 +40,14 @@
         
         if (first) {
             _io_file_fp = fopen("./log.txt", "a");
-            fprintf(_io_file_fp, "This is testing for fprintf5...\n");
-            fflush (_io_file_fp);
+            fprintf(_io_file_fp, "%2x: io_file.h\n", _io_file_fid);
             //fclose(_io_file_fp);
             first = 0;
         }
+
+        fputc(txByte, _io_file_fp);
+        fflush (_io_file_fp);
+
         return 0;
     }
 
