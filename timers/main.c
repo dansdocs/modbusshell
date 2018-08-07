@@ -22,7 +22,7 @@
 #include <stdarg.h>  // va_start, va_end 
 #include <stdint.h>  // uint8_t etc
 
-       
+        
 #define TIMERS_IMPLEMENTATION
 #include "./timers.h"
 

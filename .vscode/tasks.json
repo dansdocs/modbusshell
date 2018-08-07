@@ -1,0 +1,168 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+   
+    "tasks": [
+        {
+            "label": "config_build_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd config; ./build.bat",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        },     
+        {
+            "label": "config_run_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd config; './main_config_test.exe;pause'",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        },                 
+        {
+            "label": "cursor_build_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd cursor; ./build.bat",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        },       
+        {
+            "label": "cursor_run_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd cursor; './main_cursor_test.exe;pause'",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        },                
+        {
+            "label": "io_build_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd io; ./build.bat",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        },        
+        {
+            "label": "io_run_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd io; './main_io_test.exe;pause'",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        },                
+        {
+            "label": "logg_build_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd logg; ./build.bat",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        },
+        {
+            "label": "logg_run_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd logg; './main_logg_test.exe;pause'",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        },                        
+        {
+            "label": "ringbuf_build_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd ringbuf; ./build.bat",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        },
+        {
+            "label": "ringbuf_run_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd ringbuf; './main_ringbuf_test.exe;pause'",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        },                
+        {
+            "label": "statem_build_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd statem; ./build.bat",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        },        
+        {
+            "label": "statem_run_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd statem; './main_statem_test.exe;pause'",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        },                
+        {
+            "label": "timers_build_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd timers; ./build.bat",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        },       
+        {
+            "label": "timers_run_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd timers; start powershell './main_timers_test.exe'",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        },               
+        {
+            "label": "ucprint_build_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd ucprintf; ./build.bat",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]       
+        },
+        {
+            "label": "ucprint_run_test",
+            "type": "shell",
+            "args": [],
+            "command": "cd ucprintf; start powershell './main_ucprintf_test.exe;pause'",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]       
+        }        
+    ]
+}

@@ -14,7 +14,7 @@
 
 // -------timers test
 #define TIMERS_IMPLEMENTATION
-#include "./timers.h"
+#include "./timers/timers.h"
 
 int main()
 {
