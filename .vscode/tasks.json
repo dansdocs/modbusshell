@@ -163,6 +163,26 @@
             "problemMatcher": [
                 "$jshint"
             ]       
-        }        
+        },
+        {
+            "label": "main_build",
+            "type": "shell",
+            "args": [],
+            "command": "./build.bat",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        },       
+        {
+            "label": "main_run",
+            "type": "shell",
+            "args": [],
+            "command": "start powershell './main_modbusshell_test.exe; pause'",            
+            "presentation": {},
+            "problemMatcher": [
+                "$jshint"
+            ]
+        }                
     ]
 }

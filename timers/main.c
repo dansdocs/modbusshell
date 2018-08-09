@@ -64,7 +64,7 @@ int main()
         
         // two different ways to do the same thing. The first checks if the timer is expired then resets it as a dedicated action. 
         // the second checks and resets. 
-	    if (timers_check_expired(tmr1)) { printf("timer %i expired\n", tmr1); timers_set_timeout(tmr1, 10);}
+	    if (timers_check_expired(tmr1)) { printf("timer %i expiredd\n", tmr1); timers_set_timeout(tmr1, 10);}
 	    if (timers_check_expired_reset(tmr2, 20)) printf("timer %i expired\n", tmr2);  
         
 		timers_tick();  // needs to be called at least every 1mS          

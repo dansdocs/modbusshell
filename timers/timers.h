@@ -213,8 +213,8 @@
             static struct Perfd perfd;
  
                                  
-            // Get the time from the operating system.           
-            ftime(&timebuffer);
+            // Get the time from the operating system.
+            ftime(&timebuffer);                       
             curr_time = (uint64_t)(((timebuffer.time * 1000) + timebuffer.millitm));
              
             if (first_time) {
@@ -228,7 +228,7 @@
                 old_time = curr_time;
                 perfd.performanceLogTime++;
             }
-              
+                                     
             // update performance data.		    
             if (first_perf_time){
                 first_perf_time = 0;
@@ -246,20 +246,20 @@
             if ((uint16_t) diff_time > perfd.perf_max_time){
                 perfd.perf_max_time = (uint16_t) diff_time;
             }	
-            
+
             // Log the performance data at different rates with different log levels so messages can be filtered
             if (perfd.performanceLogTime % 1000 == 0) {
-                if ((perfd.perf_buckets[1] > 0) && (perfd.toSlowCount > 0)) errorPercent = (100/(perfd.perf_buckets[1]/perfd.toSlowCount));
-                
+
+                if ((perfd.perf_buckets[1] > 0) && (perfd.toSlowCount > 0)) errorPercent = (100/((perfd.perf_buckets[1]+perfd.toSlowCount)/perfd.toSlowCount));
+
                 if (perfd.performanceLogTime % 30000 == 0) loglvl = TIMERS_LOG_INFO;
                 else if (perfd.performanceLogTime % 5000 == 0) loglvl = TIMERS_LOG_DEBUG;
                 else loglvl = TIMERS_LOG_TRACE;   
-                             
+                                        
                 if (errorPercent == 0) TIMERS_LOG(loglvl, "Timer performance 1mS: %u, 2mS: %u, 3mS: %u, 4mS+: %u || Max: %umS || Slow: Less than 1 percent", perfd.perf_buckets[1], perfd.perf_buckets[2], perfd.perf_buckets[3], perfd.perf_buckets[4], perfd.perf_max_time);  
                 else TIMERS_LOG(loglvl, "Timer performance 1mS: %u, 2mS: %u, 3mS: %u, 4mS+: %u || Max: %umS || Slow: %u percent", perfd.perf_buckets[1], perfd.perf_buckets[2], perfd.perf_buckets[3], perfd.perf_buckets[4], perfd.perf_max_time, errorPercent);                      
                 if (perfd.performanceLogTime >= 30000) perfd.performanceLogTime = 0;           
             }            
-                                      
             return timePassed;
         }   
     #endif  // BUILD_FOR_WINDOWS                                      
