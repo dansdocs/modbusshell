@@ -5,8 +5,8 @@
    #define COMPILE_FOR_WINDOWS
 
 // -------log test
-//#define LOG_IMPLEMENTATION
-//#include "./log.h"
+#define LOGG_IMPLEMENTATION
+#include "./logg/logg.h"
 
 // -------config test
 //#define CONFIG_IMPLEMENTATION
@@ -16,6 +16,8 @@
 #define TIMERS_IMPLEMENTATION
 #include "./timers/timers.h"
 
+#define _MAI_FID ((uint8_t)(('m' << 2) + 'a' + 'i'))
+
 int main()
 {
 	// -------config test
@@ -23,8 +25,8 @@ int main()
     //config_setLogFn(&log_log);
 	//for (i=0; i<CONFIG_MAX; i++) printf("%s\n", config_get(i));
 
-	// ------- log test
-	//log_debug("blah");
+    // using logg function directly
+    logg(0, _MAI_FID, 1, &printf, "testd %2x\n", 0x73);
 	
 	// ------- timers test
 	uint8_t tmr;

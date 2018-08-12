@@ -16,6 +16,7 @@
 #define LOGG_H
 
     #include <stdarg.h>  // va_list
+    #include <stdint.h>  // uint8_t etc
 
     // function to pass in which will be used to print out messages. The approach is if vaargs is zero then parameters
     // from ... are used.  If vaargs is not zero then it will be used and ... won't be. 
