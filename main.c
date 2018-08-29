@@ -18,6 +18,26 @@
 
 #define _MAI_FID ((uint8_t)(('m' << 2) + 'a' + 'i'))
 
+uint8_t locvprintf(va_list vaargs, const char *fmt, ...){
+    va_list args; 
+    char buf[200];
+    uint8_t i=0;
+    buf[0] = '\0';
+    
+    if (vaargs != 0) vsprintf(buf, fmt, vaargs);
+    else {
+        va_start(args, fmt);
+        vsprintf(buf, fmt, args);
+        va_end(args);
+    }
+    while (buf[i] != '\0'){
+        putchar(buf[i]);
+        i++;
+    }
+    return 0;
+}
+
+
 int main()
 {
 	// -------config test
@@ -26,19 +46,16 @@ int main()
 	//for (i=0; i<CONFIG_MAX; i++) printf("%s\n", config_get(i));
 
     // using logg function directly
-    logg(0, _MAI_FID, 1, &printf, "testd %2x\n", 0x73);
+    logg(0, _MAI_FID, 1, &locvprintf, "testd %2x\n", 0x73);
 	
 	// ------- timers test
 	uint8_t tmr;
 	tmr = timers_get_timer(2);  // 1mS base tick rate. diviser is 2^10 = 100 so update rate is 1mS * 100
 	printf("Timer index: %i\n", tmr);
-	if (timers_check_expired(tmr)) printf("timer expired\n");
 	timers_set_timeout(tmr, 30);
-	printf("\nhere i am before\n");	
 	while(1){
 		timers_tick();	
 	    if (timers_check_expired(tmr)) {
-			printf("\nhere i am\n");
 		    printf("timer expired\n");
 		    timers_set_timeout(tmr, 30);
 	    }
