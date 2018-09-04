@@ -24,7 +24,7 @@
     
     _io_config_s _io_config = {.mon_sendByte_to_stdio = 1};
 
-    void io_sendByte_mon(uint8_t b);
+    uint8_t io_sendByte_mon(uint8_t b);
 
 #endif // IO_H
 
@@ -44,8 +44,9 @@
     #include "./io_file.h"   
 
 
-    void io_sendByte_mon(uint8_t b){
-        if (_io_config.mon_sendByte_to_stdio) putchar(b);    
+    uint8_t io_sendByte_mon(uint8_t b){
+        if (_io_config.mon_sendByte_to_stdio) putchar(b);
+        return 0;
     }
 
    
