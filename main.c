@@ -2,11 +2,36 @@
    serial port on arduino.  */
    
    
-   #define COMPILE_FOR_WINDOWS
+#define COMPILE_FOR_WINDOWS
 
-// -------log test
+// -------compose logging functionality 
 #define LOGG_IMPLEMENTATION
 #include "./logg/logg.h"
+#define UCPRINTF_IMPLEMENTATION
+#include "./ucprintf/ucprintf.h"
+#define IO_IMPLEMENTATION
+#include "./io/io.h"
+    //int ucprintf_vprintf(ucprintf_sendByteFnT fn, const char *fmt, va_list args);
+
+    // an example stub that sends a byte to stdout, if putchar is available.  
+uint8_t sendByteExample(uint8_t c) {
+    #if defined(BUILD_FOR_WINDOWS) || defined(BUILD_FOR_LINUX)    
+        putchar(c);
+    #endif 
+    return 1;
+}
+int op_fn_for_logg(va_list vaargs, const char *fmt, ...){
+    va_list args; 
+
+    if (vaargs != 0) ucprintf_vprintf(&sendByteExample, fmt, vaargs);
+    else {
+        va_start(args, fmt);
+        ucprintf_vprintf(&sendByteExample, fmt, args);
+        va_end(args);
+    }
+    return 0;
+
+}
 
 // -------config test
 //#define CONFIG_IMPLEMENTATION
@@ -15,6 +40,9 @@
 // -------timers test
 #define TIMERS_IMPLEMENTATION
 #include "./timers/timers.h"
+
+
+
 
 #define _MAI_FID ((uint8_t)(('m' << 2) + 'a' + 'i'))
 
@@ -60,7 +88,5 @@ int main()
 		    timers_set_timeout(tmr, 30);
 	    }
 	}
-	
-
     return 0; 
 }

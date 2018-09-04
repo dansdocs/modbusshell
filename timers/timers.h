@@ -34,6 +34,7 @@
 #define TIMERS_H
 
     #include <stdint.h>  // uint8_t etc
+    #include <windows.h> // QueryPerformanceCounter, QueryPerformanceFrequency
     
     // Its optional to pass in a function pointer for logging. If a function is provided
     // it will be used otherwise printf will be used if windows/linux - otherwise nothing.      
@@ -96,8 +97,7 @@
     
     #if defined(BUILD_FOR_WINDOWS) || defined(BUILD_FOR_LINUX) 
         #include <sys/timeb.h> //ftime timeb
-        #include <stdio.h>     // printf        
-        
+        #include <stdio.h>     // printf                
         uint8_t _timers_enoughTimePassed();
                     
         #define TIMERS_LOG(level, ...) do {if (_timers_logFn == 0){printf("\nLog level %u in %s ", level, __FILE__); printf(__VA_ARGS__); printf("\n");} else _timers_logFn(level,  __FILE__, __LINE__, __VA_ARGS__);}while(0)        
@@ -187,18 +187,24 @@
     	if (_timers_enoughTimePassed()) _timers_update();	
     }
     
-    #if defined(BUILD_FOR_WINDOWS) || defined(BUILD_FOR_LINUX)
+    #if defined(BUILD_FOR_WINDOWS) 
         // uses a system timer to see when 1mS has passed and returns 1 otherwise 0.   
         // keeps track of the performance of using the system counter - ie how many times do we meet the 1mS elapsed time
         // compared to how many times we are too slow.                              
         uint8_t _timers_enoughTimePassed(){
-	        static uint64_t old_time = 0;
+            // The  LARGE_INTEGER types are for the QueryPerformanceCounter function. 
+            // Originally only old_time was static to keep its value between function calls. 
+            // The rest have been made static to work around the issue that even through 
+            // QueryPerformanceCounter reportedly never failes, it does if its not byte aligned
+            // which seems to happen if they are stack allocated - hence making them all static. 
+	        static LARGE_INTEGER old_time;
+            static LARGE_INTEGER curr_time;
+            static LARGE_INTEGER temp_time;
+            static LARGE_INTEGER frequency;
             static uint8_t first_time = 1;
-            uint64_t curr_time = 0;
-            uint64_t diff_time = 0;
-            static uint8_t first_perf_time = 1;    
-            struct timeb timebuffer;
+            DWORD diff_time;
             uint8_t timePassed = 1;
+            static uint8_t first_perf_time = 1;               
             uint32_t errorPercent = 0;
             uint8_t loglvl;
             uint8_t i;
@@ -211,21 +217,29 @@
                 uint32_t toSlowCount;
             };
             static struct Perfd perfd;
- 
-                                 
-            // Get the time from the operating system.
-            ftime(&timebuffer);                       
-            curr_time = (uint64_t)(((timebuffer.time * 1000) + timebuffer.millitm));
-             
+
             if (first_time) {
                 first_time = 0;
-                old_time = curr_time;
+                QueryPerformanceFrequency(&frequency); 
+                QueryPerformanceCounter(&curr_time);
+                old_time.QuadPart = curr_time.QuadPart;
+                old_time.QuadPart *= 1000;  // convert to milliseconds
+                old_time.QuadPart /= frequency.QuadPart;    
             }
-               
-            diff_time = curr_time - old_time;
+
+            QueryPerformanceCounter(&curr_time);
+            curr_time.QuadPart *= 1000;  // convert to milliseconds
+            curr_time.QuadPart /= frequency.QuadPart;
+                                            
+            temp_time.QuadPart = curr_time.QuadPart - old_time.QuadPart;
+            diff_time = temp_time.LowPart; 
+            //printf("diff_time %lu\n", diff_time);
+            
+
             if (diff_time < 1) timePassed = 0;
             else {
-                old_time = curr_time;
+                timePassed = 1;
+                old_time.QuadPart = curr_time.QuadPart;
                 perfd.performanceLogTime++;
             }
                                      
@@ -248,8 +262,7 @@
             }	
 
             // Log the performance data at different rates with different log levels so messages can be filtered
-            if (perfd.performanceLogTime % 1000 == 0) {
-
+            if (perfd.performanceLogTime % 1000 == 0) {  
                 if ((perfd.perf_buckets[1] > 0) && (perfd.toSlowCount > 0)) errorPercent = (100/((perfd.perf_buckets[1]+perfd.toSlowCount)/perfd.toSlowCount));
 
                 if (perfd.performanceLogTime % 30000 == 0) loglvl = TIMERS_LOG_INFO;

@@ -87,6 +87,8 @@ int main() {
         io_sock_sendByte(&sock2, '2');   
    //     io_sock_sendByte(&sock3, '3');
    //     io_sock_sendByte(&sock4, '4');  
+   
+        io_sendByte_mon('a');
         wait(1);  
         
           

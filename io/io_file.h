@@ -37,6 +37,7 @@
     
     uint8_t io_file_sendByte(uint8_t txByte){
         static uint8_t first = 1;
+        printf("here i am\r\n");
         
         if (first) {
             _io_file_fp = fopen("./log.txt", "a");

@@ -28,7 +28,7 @@ goto end
     echo. 
     echo Building main.c
     echo.
-    gcc ./main.c -DBUILD_FOR_WINDOWS -Wall -s -o2 -o main_%sDirName%_test.exe  
+    gcc ./main.c -DBUILD_FOR_WINDOWS -Wall -s -o2 -o main_%sDirName%_test.exe -L./io/ -lws2_32
 
 :end
 @echo on
