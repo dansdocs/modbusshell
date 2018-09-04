@@ -54,7 +54,6 @@ int main()
 	uint8_t tmr1;
     uint8_t tmr2;
 
-
     // get a timer, should cause timers.h to log something to its own logger. 
 	tmr1 = timers_get_timer(2);      
       
@@ -76,9 +75,7 @@ int main()
         }
 	    if (timers_check_expired_reset(tmr2, 20)) printf("timer %i expired\r\n", tmr2);  
         //printf(".");
-		timers_tick();  // needs to be called at least every 1mS
-        //for (sleepcycles = 0; sleepcycles<1; sleepcycles++) Sleep(0);  
-        //Sleep(0);        
+		timers_tick();  // needs to be called at least every 1mS        
 	}
 	
     return 0; 

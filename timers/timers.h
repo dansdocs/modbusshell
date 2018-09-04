@@ -263,16 +263,16 @@
 
             // Log the performance data at different rates with different log levels so messages can be filtered
             if (perfd.performanceLogTime % 1000 == 0) {  
-                if ((perfd.perf_buckets[1] > 0) && (perfd.toSlowCount > 0)) errorPercent = (100/((perfd.perf_buckets[1]+perfd.toSlowCount)/perfd.toSlowCount));
-
+ 
                 if (perfd.performanceLogTime % 30000 == 0) loglvl = TIMERS_LOG_INFO;
                 else if (perfd.performanceLogTime % 5000 == 0) loglvl = TIMERS_LOG_DEBUG;
                 else loglvl = TIMERS_LOG_TRACE;   
                                         
-                if (errorPercent == 0) TIMERS_LOG(loglvl, "Timer performance 1mS: %u, 2mS: %u, 3mS: %u, 4mS+: %u || Max: %umS || Slow: Less than 1 percent", perfd.perf_buckets[1], perfd.perf_buckets[2], perfd.perf_buckets[3], perfd.perf_buckets[4], perfd.perf_max_time);  
-                else TIMERS_LOG(loglvl, "Timer performance 1mS: %u, 2mS: %u, 3mS: %u, 4mS+: %u || Max: %umS || Slow: %u percent", perfd.perf_buckets[1], perfd.perf_buckets[2], perfd.perf_buckets[3], perfd.perf_buckets[4], perfd.perf_max_time, errorPercent);                      
+                if (errorPercent == 0) TIMERS_LOG(loglvl, "Timer performance 1mS: %u, 2mS: %u, 3mS: %u, 4mS+: %u || Max: %umS", perfd.perf_buckets[1], perfd.perf_buckets[2], perfd.perf_buckets[3], perfd.perf_buckets[4], perfd.perf_max_time);  
+                else TIMERS_LOG(loglvl, "Timer performance 1mS: %u, 2mS: %u, 3mS: %u, 4mS+: %u || Max: %umS ", perfd.perf_buckets[1], perfd.perf_buckets[2], perfd.perf_buckets[3], perfd.perf_buckets[4], perfd.perf_max_time);                      
                 if (perfd.performanceLogTime >= 30000) perfd.performanceLogTime = 0;           
             }            
+            for (i = 0; i < 10; i++) Sleep(0); // Sleep is 1mS or more or a value of zero just finishes the timeslice.
             return timePassed;
         }   
     #endif  // BUILD_FOR_WINDOWS                                      
