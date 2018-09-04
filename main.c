@@ -20,7 +20,7 @@ uint8_t sendByteExample(uint8_t c) {
     #endif 
     return 1;
 }
-int op_fn_for_logg(va_list vaargs, const char *fmt, ...){
+uint8_t op_fn_for_logg(va_list vaargs, const char *fmt, ...){
     va_list args; 
 
     if (vaargs != 0) ucprintf_vprintf(&sendByteExample, fmt, vaargs);
@@ -74,7 +74,7 @@ int main()
 	//for (i=0; i<CONFIG_MAX; i++) printf("%s\n", config_get(i));
 
     // using logg function directly
-    logg(0, _MAI_FID, 1, &locvprintf, "testd %2x\n", 0x73);
+    logg(0, _MAI_FID, 1, &op_fn_for_logg, "testd %2x\n", 0x73);
 	
 	// ------- timers test
 	uint8_t tmr;

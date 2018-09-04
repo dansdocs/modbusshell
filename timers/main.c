@@ -46,9 +46,6 @@
 #endif
 
 
-
-
-
 int main()
 {
 	uint8_t tmr1;
