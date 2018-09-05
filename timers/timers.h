@@ -38,8 +38,8 @@
     
     // Its optional to pass in a function pointer for logging. If a function is provided
     // it will be used otherwise printf will be used if windows/linux - otherwise nothing.      
-    // Intention is: level,  __FILE__, __LINE__, __VA_ARGS__ 
-    typedef void (*timers_logFnT)(uint8_t, const char *, uint16_t, const char *, ...); 
+    //void composed_logg(uint8_t fid, uint8_t lvl, const char *fmt, ...)
+    typedef void (*timers_logFnT)(uint8_t, uint8_t, const char *, ...); 
     
     // Its optional to pass in a function pointer for logging. If a function is provided
     // it will be used otherwise printf will be used and its windows/linux otherwise nothing.    
@@ -85,25 +85,24 @@
 
     // On windows and linux instead of an interupt calling the timers_tick() to update the timers 
     // every millisecond; instead timers_tick() is just called continuously and the system clock is checked 
-    // to see if a mS has passed. The performance of doing this is recorded and loged. 
-        
-    // use the macro TIMERS_LOG like so:
-    // TIMERS_LOG(TIMERS_LOG_WARN, "this is warning number %u", 5);
-    // and the macro will either use the function passed in or printf if no function has been provided & win/linux
-    // otherwise nothing.    
-    timers_logFnT _timers_logFn = 0;
-    void timers_setLogFn(timers_logFnT fn){_timers_logFn = fn;}  
+    // to see if a mS has passed. The performance of doing this is recorded and loged.
+
+    // Infrustructure for logging.  
+    #define _TIMERS_FID ((uint8_t)(('t' << 2) + 'i' + 'm'))
     enum { TIMERS_LOG_TRACE, TIMERS_LOG_DEBUG, TIMERS_LOG_INFO, TIMERS_LOG_WARN, TIMERS_LOG_ERROR, TIMERS_LOG_FATAL };    
-    
+    void _timers_dummylogFn (uint8_t fid, uint8_t lvl, const char *fmt, ...){;}    
+    timers_logFnT timers_logFn = &_timers_dummylogFn;
+    void timers_setLogFn(timers_logFnT fn){
+        timers_logFn = fn;
+        timers_logFn(_TIMERS_FID, TIMERS_LOG_INFO, "%02x = timers.h", _TIMERS_FID);    
+    }  
+        
     #if defined(BUILD_FOR_WINDOWS) || defined(BUILD_FOR_LINUX) 
         #include <sys/timeb.h> //ftime timeb
         #include <stdio.h>     // printf                
         uint8_t _timers_enoughTimePassed();
-                    
-        #define TIMERS_LOG(level, ...) do {if (_timers_logFn == 0){printf("\nLog level %u in %s ", level, __FILE__); printf(__VA_ARGS__); printf("\n");} else _timers_logFn(level,  __FILE__, __LINE__, __VA_ARGS__);}while(0)        
     #else        
         #define _timers_enoughTimePassed() 1
-        #define TIMERS_LOG(level, ...) do {if (_timers_logFn != 0) _timers_logFn(level,  __FILE__, __LINE__, __VA_ARGS__);}while(0)        
     #endif // BUILD_FOR_WINDOWS || BUILD_FOR_LINUX         
 
 
@@ -126,7 +125,7 @@
         if (_timers_allocationIndex < TIMERS_MAXTIMERS-1) {
             _timers_allocationIndex++;
             _timers_power10div[_timers_allocationIndex] = div_power10;
-            TIMERS_LOG(TIMERS_LOG_INFO, "Timer 0x%02X of 0x%02X allocated.", _timers_allocationIndex, TIMERS_MAXTIMERS-1);      
+            timers_logFn(_TIMERS_FID, TIMERS_LOG_INFO, "Timer 0x%02X of 0x%02X allocated.", _timers_allocationIndex, TIMERS_MAXTIMERS-1);    
             return (_timers_allocationIndex);
         }
         return 0;  // signify that no timers are left to provide
@@ -205,7 +204,6 @@
             DWORD diff_time;
             uint8_t timePassed = 1;
             static uint8_t first_perf_time = 1;               
-            uint32_t errorPercent = 0;
             uint8_t loglvl;
             uint8_t i;
 
@@ -263,13 +261,10 @@
 
             // Log the performance data at different rates with different log levels so messages can be filtered
             if (perfd.performanceLogTime % 1000 == 0) {  
- 
                 if (perfd.performanceLogTime % 30000 == 0) loglvl = TIMERS_LOG_INFO;
                 else if (perfd.performanceLogTime % 5000 == 0) loglvl = TIMERS_LOG_DEBUG;
-                else loglvl = TIMERS_LOG_TRACE;   
-                                        
-                if (errorPercent == 0) TIMERS_LOG(loglvl, "Timer performance 1mS: %u, 2mS: %u, 3mS: %u, 4mS+: %u || Max: %umS", perfd.perf_buckets[1], perfd.perf_buckets[2], perfd.perf_buckets[3], perfd.perf_buckets[4], perfd.perf_max_time);  
-                else TIMERS_LOG(loglvl, "Timer performance 1mS: %u, 2mS: %u, 3mS: %u, 4mS+: %u || Max: %umS ", perfd.perf_buckets[1], perfd.perf_buckets[2], perfd.perf_buckets[3], perfd.perf_buckets[4], perfd.perf_max_time);                      
+                else loglvl = TIMERS_LOG_TRACE;                           
+                timers_logFn(_TIMERS_FID, loglvl, "Timer performance 1mS: %u, 2mS: %u, 3mS: %u, 4mS+: %u || Max: %umS", perfd.perf_buckets[1], perfd.perf_buckets[2], perfd.perf_buckets[3], perfd.perf_buckets[4], perfd.perf_max_time);                     
                 if (perfd.performanceLogTime >= 30000) perfd.performanceLogTime = 0;           
             }            
             for (i = 0; i < 10; i++) Sleep(0); // Sleep is 1mS or more or a value of zero just finishes the timeslice.

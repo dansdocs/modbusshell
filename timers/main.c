@@ -29,21 +29,27 @@
 
 // A simple loging function to pass in to timers.h. 
 #if defined(BUILD_FOR_WINDOWS) || defined(BUILD_FOR_LINUX) 
-    void test_logger(uint8_t level, const char *file, uint16_t line, const char *fmt, ...) {    
+    //void composed_logg(uint8_t fid, uint8_t lvl, const char *fmt, ...);
+    //typedef void (*timers_logFnT)(uint8_t, uint8_t, const char *, ...); 
+    void test_logger(uint8_t fid, uint8_t lvl, const char *fmt, ...) {    
         va_list args;
-        printf("\n-------------------------\r\n");
-        printf("Log level %i in file %s at line number %i with message: \n", level, file, line);
+        printf("[%02x, %02x] : ", fid, lvl);
         va_start(args, fmt);
         vprintf(fmt, args);
-        va_end(args);
-        printf("\n");
-        printf("-------------------------\r\n");    
+        va_end(args); 
+        putchar('\n'); 
     }
 #else
     #pragma message("No log Fn for BUILD_FOR_ARDUINO target... yet")
-    void test_logger(uint8_t level, const char *file, uint16_t line, const char *fmt, ...) {        
+    void test_logger(uint8_t fid, uint8_t lvl, const char *fmt, ...) {        
     }
 #endif
+
+// Infrustructure for logging.  
+
+#define _MAIN_FID ((uint8_t)(('m' << 2) + 't' + 'i')) 
+enum {MAIN_LOG_TRACE, MAIN_LOG_DEBUG, MAIN_LOG_INFO, MAIN_LOG_WARN, MAIN_LOG_ERROR, MAIN_LOG_FATAL };    
+
 
 
 int main()
@@ -51,13 +57,15 @@ int main()
 	uint8_t tmr1;
     uint8_t tmr2;
 
-    // get a timer, should cause timers.h to log something to its own logger. 
+    test_logger(_MAIN_FID, MAIN_LOG_INFO, "%02x = main.c", _MAIN_FID); 
+
+    // get a timer, should not cause any log output because log fn isn't set. 
 	tmr1 = timers_get_timer(2);      
       
     // Pass in a function to use as a logging function.   
     timers_setLogFn(&test_logger);
     
-    // get another timer, now that the logFn has been set timers.h should use that instead. 
+    // get another timer, now that the logFn has been set timers.h should see some output. 
 	tmr2 = timers_get_timer(2);    // 1mS base tick rate. diviser is 2^10 = 100 so update rate is 1mS * 100 = 100mS
 	timers_set_timeout(tmr1, 10);  // 100mS * 10 = 1 second
     timers_set_timeout(tmr2, 20);  // 100mS * 10 = 2 second
@@ -67,11 +75,11 @@ int main()
         // two different ways to do the same thing. The first checks if the timer is expired then resets it as a dedicated action. 
         // the second checks and resets. 
 	    if (timers_check_expired(tmr1)) { 
-            printf("timer %i expired\r\n", tmr1); 
+             test_logger(_MAIN_FID, MAIN_LOG_INFO, "timer %i expired", tmr1); 
             timers_set_timeout(tmr1, 10);
         }
-	    if (timers_check_expired_reset(tmr2, 20)) printf("timer %i expired\r\n", tmr2);  
-        //printf(".");
+	    if (timers_check_expired_reset(tmr2, 20)) test_logger(_MAIN_FID, MAIN_LOG_INFO, "timer %i expired", tmr2);  
+
 		timers_tick();  // needs to be called at least every 1mS        
 	}
 	
