@@ -45,7 +45,9 @@
 
 
     uint8_t io_sendByte_mon(uint8_t b){
-        if (_io_config.mon_sendByte_to_stdio) putchar(b);
+        if (_io_config.mon_sendByte_to_stdio) {
+            putchar(b);
+        }
         return 0;
     }
 

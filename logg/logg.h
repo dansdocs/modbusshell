@@ -57,7 +57,7 @@
               
         if (lvl <= _logg_lvl){
             for (i=0; i<_LOGG_MAX_FILES; i++) if (fid == _logg_fids[i]) return 0;
-            pfn(0, "%2x: ", fid);
+            pfn(0, "[%02x, %02x] : ", fid, lvl);
             if (vaargs == 0){
                 va_start(args, fmt);
                 pfn(args, fmt);

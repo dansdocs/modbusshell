@@ -125,7 +125,7 @@
         if (_timers_allocationIndex < TIMERS_MAXTIMERS-1) {
             _timers_allocationIndex++;
             _timers_power10div[_timers_allocationIndex] = div_power10;
-            timers_logFn(_TIMERS_FID, TIMERS_LOG_INFO, "Timer 0x%02X of 0x%02X allocated.", _timers_allocationIndex, TIMERS_MAXTIMERS-1);    
+            timers_logFn(_TIMERS_FID, TIMERS_LOG_INFO, "Timer %2u of %2u allocated.", _timers_allocationIndex, TIMERS_MAXTIMERS-1);    
             return (_timers_allocationIndex);
         }
         return 0;  // signify that no timers are left to provide
@@ -264,7 +264,7 @@
                 if (perfd.performanceLogTime % 30000 == 0) loglvl = TIMERS_LOG_INFO;
                 else if (perfd.performanceLogTime % 5000 == 0) loglvl = TIMERS_LOG_DEBUG;
                 else loglvl = TIMERS_LOG_TRACE;                           
-                timers_logFn(_TIMERS_FID, loglvl, "Timer performance 1mS: %u, 2mS: %u, 3mS: %u, 4mS+: %u || Max: %umS", perfd.perf_buckets[1], perfd.perf_buckets[2], perfd.perf_buckets[3], perfd.perf_buckets[4], perfd.perf_max_time);                     
+                timers_logFn(_TIMERS_FID, loglvl, "Timer performance 1mS: %d, 2mS: %d, 3mS: %d, 4mS+: %d || Max: %dmS", perfd.perf_buckets[1], perfd.perf_buckets[2], perfd.perf_buckets[3], perfd.perf_buckets[4], perfd.perf_max_time);                     
                 if (perfd.performanceLogTime >= 30000) perfd.performanceLogTime = 0;           
             }            
             for (i = 0; i < 10; i++) Sleep(0); // Sleep is 1mS or more or a value of zero just finishes the timeslice.
