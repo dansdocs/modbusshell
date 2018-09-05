@@ -38,7 +38,8 @@ void composed_logg(uint8_t fid, uint8_t lvl, const char *fmt, ...){
 
 
 
-#define _MAI_FID ((uint8_t)(('m' << 2) + 'a' + 'i'))
+#define _MAIN_FID ((uint8_t)(('m' << 2) + 'a' + 'i'))
+enum {MAIN_LOG_TRACE, MAIN_LOG_DEBUG, MAIN_LOG_INFO, MAIN_LOG_WARN, MAIN_LOG_ERROR, MAIN_LOG_FATAL };    
 
 
 
@@ -49,7 +50,7 @@ int main()
     //config_setLogFn(&log_log);
 	//for (i=0; i<CONFIG_MAX; i++) printf("%s\n", config_get(i));
 
-    composed_logg(_MAI_FID, 1, "testd %2x\n", 0x73);
+    composed_logg(_MAIN_FID, MAIN_LOG_INFO, "%02x = main.c", _MAIN_FID); 
 
 
 	// ------- timers test

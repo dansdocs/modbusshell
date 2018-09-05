@@ -57,7 +57,7 @@ int main()
 	uint8_t tmr1;
     uint8_t tmr2;
 
-    test_logger(_MAIN_FID, MAIN_LOG_INFO, "%02x = main.c", _MAIN_FID); 
+    test_logger(_MAIN_FID, MAIN_LOG_INFO, "%02x = timers/main.c", _MAIN_FID); 
 
     // get a timer, should not cause any log output because log fn isn't set. 
 	tmr1 = timers_get_timer(2);      

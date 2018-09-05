@@ -94,7 +94,7 @@
     timers_logFnT timers_logFn = &_timers_dummylogFn;
     void timers_setLogFn(timers_logFnT fn){
         timers_logFn = fn;
-        timers_logFn(_TIMERS_FID, TIMERS_LOG_INFO, "%02x = timers.h", _TIMERS_FID);    
+        timers_logFn(_TIMERS_FID, TIMERS_LOG_INFO, "%02x = timers/timers.h", _TIMERS_FID);    
     }  
         
     #if defined(BUILD_FOR_WINDOWS) || defined(BUILD_FOR_LINUX) 
