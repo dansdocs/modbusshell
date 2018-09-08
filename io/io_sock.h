@@ -29,7 +29,8 @@
     typedef struct io_sock_s {
       int sockfd;
       int portno;
-      int servsockfd; 
+      int servsockfd;
+      uint8_t state; 
       socklen_t clilen;
       struct sockaddr_in serv_addr;
       struct sockaddr_in cli_addr;
@@ -57,6 +58,8 @@
 #ifdef IO_SOCK_IMPLEMENTATION
 #undef IO_SOCK_IMPLEMENTATION
 
+    enum {IO_SOCK_START_S, IO_SOCK_ACCEPT_S };
+
    // Infrustructure for logging.  
     #define _IO_SOCK_FID ((uint8_t)(('i' << 2) + 'o' + 's'))
     enum { IO_SOCK_LOG_TRACE, IO_SOCK_LOG_DEBUG, IO_SOCK_LOG_INFO, IO_SOCK_LOG_WARN, IO_SOCK_LOG_ERROR, IO_SOCK_LOG_FATAL };    
@@ -67,7 +70,9 @@
         io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_INFO, "%02x = io/io_sock.h", _IO_SOCK_FID);    
     }     
     
-    #define io_sock_bzero(b,len) (memset((b), '\0', (len)), (void) 0)  
+    #define io_sock_bzero(b,len) (memset((b), '\0', (len)), (void) 0)
+
+   
     
     uint8_t io_sock_initComs(io_sock_s *s, uint16_t chConfig, char *adConfig) {
           
@@ -75,6 +80,7 @@
         s-> connectToRemoteServer = 0;
         #ifdef BUILD_FOR_WINDOWS
             s-> on = 1;
+            int nError;
         #endif
         
         strcpy(s-> address, adConfig);      
@@ -122,23 +128,44 @@
                     close(s-> sockfd);
                 #endif                                
 	        }
-            s-> clilen = sizeof(s-> cli_addr);
-            s-> servsockfd = accept(s-> sockfd, (struct sockaddr *) &(s-> cli_addr), &(s-> clilen));
-            if (s-> servsockfd < 0) {
-	             io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR on accept");
-                 #ifdef BUILD_FOR_WINDOWS                  
-		             WSACleanup();
-                 #endif                     
-	        }
-	        else {
+            else {
                 // set to non-blocking
                 #ifdef BUILD_FOR_WINDOWS  
-                    ioctlsocket(s-> servsockfd, FIONBIO, &(s-> on));  
+                    ioctlsocket(s-> sockfd, FIONBIO, &(s-> on));  
                 #endif   
                 #ifdef BUILD_FOR_LINUX                
-                    fcntl(s-> servsockfd, F_SETFL, O_NONBLOCK);
-                #endif                     
-            }	  
+                    fcntl(s-> sockfd, F_SETFL, O_NONBLOCK);
+                #endif 
+            }
+
+            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_TRACE, "Before blocking");
+            s-> clilen = sizeof(s-> cli_addr);
+            nError = WSAEWOULDBLOCK;
+            while (nError == WSAEWOULDBLOCK){
+                nError = 0;
+                s-> servsockfd = accept(s-> sockfd, (struct sockaddr *) &(s-> cli_addr), &(s-> clilen));
+                if (s-> servsockfd < 0) {
+	                io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR on accept");
+                    nError = WSAGetLastError(); 
+                    if (nError == WSAEWOULDBLOCK) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Would block");
+                    else {
+                         #ifdef BUILD_FOR_WINDOWS                  
+		                    WSACleanup();
+                         #endif
+                    }                     
+	            }
+	            else {
+                    // set to non-blocking
+                    #ifdef BUILD_FOR_WINDOWS  
+                        ioctlsocket(s-> servsockfd, FIONBIO, &(s-> on));  
+                    #endif   
+                    #ifdef BUILD_FOR_LINUX                
+                        fcntl(s-> servsockfd, F_SETFL, O_NONBLOCK);
+                    #endif                     
+                }
+                Sleep(800);
+            }
+            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_TRACE, "AFTER blocking");	  
 	    }
 	    else {
 		    // we have an ip address for a server to connect to, so connect to it. 

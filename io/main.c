@@ -51,6 +51,11 @@ void wait( int seconds )
 #define _MAIN_FID ((uint8_t)(('m' << 2) + 'i' + 'o')) 
 enum {MAIN_LOG_TRACE, MAIN_LOG_DEBUG, MAIN_LOG_INFO, MAIN_LOG_WARN, MAIN_LOG_ERROR, MAIN_LOG_FATAL };    
 
+enum {CONFIG_PORT, CONFIG_ADDRESS, CONFIG_LOGSTDERROR, CONFIG_LOGFILE, CONFIG_LOGLEVEL};
+char* test_config(uint8_t idx){
+    if (idx == CONFIG_PORT) return "3000";
+    else return "0";
+}
 
 
 int main() {
@@ -68,11 +73,13 @@ int main() {
 
      test_logger(_MAIN_FID, MAIN_LOG_INFO, "%02x = io/main.c", _MAIN_FID); 
      io_setLogFn(&test_logger);
+     io_setConfigFn(&test_config);
      
     io_sock_initComs(&sock1, 3000, "");
     io_sock_initComs(&sock2, 3001, "");
   //  io_sock_initComs(&sock3, 3002, "");
   //  io_sock_initComs(&sock4, 3003, "");
+
   
     while(1){
         if (io_sock_getByte(&sock1, &b1)){
