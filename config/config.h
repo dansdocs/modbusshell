@@ -31,11 +31,10 @@
     // then the function call:
     // config_get(CONFIG_PORT);
     // would return the string "3000"
-    char* config_get(int config);
+    char* config_get(uint8_t config);
 
-    // Its optional to pass in a function pointer for logging. If a function is provided
-    // it will be used otherwise printf will be used.     
-    typedef void (*config_logFnT)(int, const char *, int, const char *, ...); 
+    // Its optional to pass in a function pointer for logging. 
+    typedef void (*config_logFnT)(uint8_t, uint8_t, const char *, ...); 
     void config_setLogFn(config_logFnT fn);
     
     #define CONFIG_FILE_NAME "config.txt"
@@ -58,14 +57,13 @@
     X(CONFIG_LOGLEVEL,    "loglevel")    
     
     #define X(a, b) a,
-    enum {CONFIG_KEYS CONFIG_MAX};
+        enum {CONFIG_KEYS CONFIG_MAX};
     #undef X
 
     #define X(a, b) {b},
-    static const char config_keys[CONFIG_MAX][CONFIG_BUFFERSIZE] = {CONFIG_KEYS};
+        static const char config_keys[CONFIG_MAX][CONFIG_BUFFERSIZE] = {CONFIG_KEYS};
     #undef X
 
-       
 #endif // CONFIG_H
 
 //------------------------------------------------------------------------------------------
@@ -75,21 +73,21 @@
 #ifdef CONFIG_IMPLEMENTATION
 #undef CONFIG_IMPLEMENTATION
 
-  #include <stdint.h> // for uint8_t etc. 
-  #include <ctype.h>  // for tolower()
-  #include <stdio.h>  // for fopen, fgetc, fclose
-  #include <string.h> // for strcmp
+    #include <stdint.h> // for uint8_t etc. 
+    #include <ctype.h>  // for tolower()
+    #include <stdio.h>  // for fopen, fgetc, fclose
+    #include <string.h> // for strcmp
   
-  // use the macro CONFIG_LOG like so:
-  // CONFIG_LOG(CONFIG_LOG_WARN, "this is warning number %i", 5);
-  // and the macro will either use the function passed in or printf if no function has been provided.  
+    // Infrustructure for logging.  
+    #define _CONFIG_FID ((uint8_t)(('c' << 2) + 'o' + 'n'))
+    enum { CONFIG_LOG_TRACE, CONFIG_LOG_DEBUG, CONFIG_LOG_INFO, CONFIG_LOG_WARN, CONFIG_LOG_ERROR, CONFIG_LOG_FATAL };    
+    void _config_dummylogFn (uint8_t fid, uint8_t lvl, const char *fmt, ...){;}    
+    config_logFnT config_logFn = &_config_dummylogFn;
+    void config_setLogFn(config_logFnT fn){
+        config_logFn = fn;
+        config_logFn(_CONFIG_FID, CONFIG_LOG_INFO, "%02x = config/config.h", _CONFIG_FID);    
+    } 
  
-  config_logFnT _config_logFn = NULL;
-  void config_setLogFn(config_logFnT fn){_config_logFn = fn;}
-  
-  enum { CONFIG_LOG_TRACE, CONFIG_LOG_DEBUG, CONFIG_LOG_INFO, CONFIG_LOG_WARN, CONFIG_LOG_ERROR, CONFIG_LOG_FATAL };
-  #define CONFIG_LOG(level, ...) do {if (_config_logFn == NULL){printf("Err %i in %s ", level, __FILE__); printf(__VA_ARGS__); printf("\n");} else _config_logFn(level,  __FILE__, __LINE__, __VA_ARGS__);}while(0)
-      
   void _config_readFile(char cfg[][CONFIG_BUFFERSIZE]){
       int i;
       int j;
@@ -105,7 +103,7 @@
       for (j = 0; j < CONFIG_BUFFERSIZE; j++) st[j] = '\0';
 		  
       fp = fopen(CONFIG_FILE_NAME, "r");
-      if (fp == NULL) CONFIG_LOG(CONFIG_LOG_WARN, "%s not found", CONFIG_FILE_NAME);
+      if (fp == NULL)  config_logFn(_CONFIG_FID, CONFIG_LOG_INFO,  "%s not found", CONFIG_FILE_NAME);
       else {
           while ((c = fgetc(fp)) != EOF){				  
               // skip whitespace & reset statemachine if we get a close bracket.
@@ -141,7 +139,7 @@
       }      	          
   }
     
-  char* config_get(int key){
+  char* config_get(uint8_t key){
       
       int i;
       int j;

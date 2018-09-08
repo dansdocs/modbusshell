@@ -16,7 +16,11 @@
     #ifdef BUILD_FOR_LINUX
     #endif  
     
-    
+    // type of function to pass in for log messages. 
+    //uint8_t fid, uint8_t lvl, const char *fmt, ...
+    typedef void (*io_file_logFnT)(uint8_t, uint8_t, const char *, ...);    
+    void io_file_setLogFn(io_file_logFnT fn);
+
     uint8_t io_file_sendByte(uint8_t txByte);
         
 #endif // IO_FILE_H
@@ -29,20 +33,24 @@
 #undef IO_FILE_IMPLEMENTATION
 
     #include <stdio.h>
-    #define _IO_FILE_CFID "iof" 
-    uint8_t _io_file_fid = ((uint8_t)(('i' << 2) + 'o' + 'f'));
+
+    // Infrustructure for logging.  
+    #define _IO_FILE_FID ((uint8_t)(('i' << 2) + 'o' + 'f'))
+    enum { IO_FILE_LOG_TRACE, IO_FILE_LOG_DEBUG, IO_FILE_LOG_INFO, IO_FILE_LOG_WARN, IO_FILE_LOG_ERROR, IO_FILE_LOG_FATAL };    
+    void _io_file_dummylogFn (uint8_t fid, uint8_t lvl, const char *fmt, ...){;}    
+    io_file_logFnT io_file_logFn = &_io_file_dummylogFn;
+    void io_file_setLogFn(io_file_logFnT fn){
+        io_file_logFn = fn;
+        io_file_logFn(_IO_FILE_FID, IO_FILE_LOG_INFO, "%02x = io/io_file.h", _IO_FILE_FID);    
+    }  
 
     FILE *_io_file_fp;
-
     
     uint8_t io_file_sendByte(uint8_t txByte){
         static uint8_t first = 1;
-        printf("here i am\r\n");
         
         if (first) {
             _io_file_fp = fopen("./log.txt", "a");
-            fprintf(_io_file_fp, "%2x: io_file.h\n", _io_file_fid);
-            //fclose(_io_file_fp);
             first = 0;
         }
 

@@ -44,9 +44,9 @@
     
     // type of function to pass in for log messages. 
     //uint8_t fid, uint8_t lvl, const char *fmt, ...
-    typedef void (*io_sock_loggfnt)(uint8_t, uint8_t, const char *, ...);
+    typedef void (*io_sock_logFnT)(uint8_t, uint8_t, const char *, ...);
     
-    void io_sock_set_loggfn(io_sock_loggfnt fn);
+    void io_sock_setLogFn(io_sock_logFnT fn);
         
 #endif // IO_SOCK_H
 
@@ -57,18 +57,18 @@
 #ifdef IO_SOCK_IMPLEMENTATION
 #undef IO_SOCK_IMPLEMENTATION
 
-    io_sock_loggfnt _io_sock_logfn;
-    #define _IO_SOCK_CFID "ios" 
-    uint8_t _io_sock_fid = ((uint8_t)(('i' << 2) + 'o' + 's'));
-    
+   // Infrustructure for logging.  
+    #define _IO_SOCK_FID ((uint8_t)(('i' << 2) + 'o' + 's'))
+    enum { IO_SOCK_LOG_TRACE, IO_SOCK_LOG_DEBUG, IO_SOCK_LOG_INFO, IO_SOCK_LOG_WARN, IO_SOCK_LOG_ERROR, IO_SOCK_LOG_FATAL };    
+    void _io_sock_dummylogFn (uint8_t fid, uint8_t lvl, const char *fmt, ...){;}    
+    io_sock_logFnT io_sock_logFn = &_io_sock_dummylogFn;
+    void io_sock_setLogFn(io_sock_logFnT fn){
+        io_sock_logFn = fn;
+        io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_INFO, "%02x = io/io_sock.h", _IO_SOCK_FID);    
+    }     
     
     #define io_sock_bzero(b,len) (memset((b), '\0', (len)), (void) 0)  
-  
-    void io_sock_set_loggfn(io_sock_loggfnt fn){
-        _io_sock_logfn = fn;
-        _io_sock_logfn(_io_sock_fid, 4, "FileId %s\n", _IO_SOCK_CFID);
-    }
-  
+    
     uint8_t io_sock_initComs(io_sock_s *s, uint16_t chConfig, char *adConfig) {
           
         s-> portno = (int) chConfig;        
@@ -79,18 +79,18 @@
         
         strcpy(s-> address, adConfig);      
         
-        if (s-> address[0] == '\0') _io_sock_logfn(_io_sock_fid, 4, "No address. Act as server listing on port: %i\n", s-> portno);
+        if (s-> address[0] == '\0') io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "No address. Act as server listing on port: %d", s-> portno);
         else {
-            _io_sock_logfn(_io_sock_fid, 4, "Connecting to server with address %s on port %i", s-> address, s-> portno);
+            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Connecting to server with address %s on port %d", s-> address, s-> portno);
         }
         
         #ifdef BUILD_FOR_WINDOWS 
             // Initialize Winsock
             s-> iResult = WSAStartup(MAKEWORD(2,2), &(s-> wsaData));
-            if (s-> iResult != 0) _io_sock_logfn(_io_sock_fid, 4, "WSAStartup failed with error: %d\n", s-> iResult);
+            if (s-> iResult != 0) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "WSAStartup failed with error: %d", s-> iResult);
         #endif  
         s-> sockfd = socket(AF_INET, SOCK_STREAM, 0);
-        if (s-> sockfd < 0) _io_sock_logfn(_io_sock_fid, 4, "ERROR opening socket");
+        if (s-> sockfd < 0) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR opening socket");
         io_sock_bzero((char *) &(s-> serv_addr), sizeof(s-> serv_addr));
         s-> serv_addr.sin_family = AF_INET;
         s-> serv_addr.sin_port = htons(s-> portno);
@@ -101,7 +101,7 @@
 		    s-> connectToRemoteServer = 0;
             s-> serv_addr.sin_addr.s_addr = INADDR_ANY;
             if (bind(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr)) < 0) {
- 	            _io_sock_logfn(_io_sock_fid, 4, "ERROR on binding\n");
+ 	            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR on binding");
                 #ifdef BUILD_FOR_WINDOWS
                     closesocket(s-> sockfd);
                     WSACleanup();
@@ -113,7 +113,7 @@
 
             // 5 is the maximum number of connections (backlog). 
             if (listen(s-> sockfd, 5) < 0){
-	            _io_sock_logfn(_io_sock_fid, 4, "Socket listen error\n");
+	            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Socket listen error");
                 #ifdef BUILD_FOR_WINDOWS   
                     closesocket(s-> sockfd);                              
                     WSACleanup();
@@ -125,7 +125,7 @@
             s-> clilen = sizeof(s-> cli_addr);
             s-> servsockfd = accept(s-> sockfd, (struct sockaddr *) &(s-> cli_addr), &(s-> clilen));
             if (s-> servsockfd < 0) {
-	             _io_sock_logfn(_io_sock_fid, 4, "ERROR on accept");
+	             io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR on accept");
                  #ifdef BUILD_FOR_WINDOWS                  
 		             WSACleanup();
                  #endif                     
@@ -145,7 +145,7 @@
 		    s-> connectToRemoteServer = 1;
 		    s-> serv_addr.sin_addr.s_addr = inet_addr(s-> address);
 		    if (connect(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr)) != 0 ){
-                _io_sock_logfn(_io_sock_fid, 4, "Connect error when connecting to server\n");
+                io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Connect error when connecting to server");
                 #ifdef BUILD_FOR_WINDOWS   
                     closesocket(s-> sockfd);              
                     WSACleanup();
@@ -176,7 +176,7 @@
         static uint8_t first = 1;
         
         if (first) {
-            _io_sock_logfn(_io_sock_fid, 4, "Connected\n");
+            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_WARN, "Connected");
             first = 0;
         }
       
@@ -201,7 +201,7 @@
             else nError = 0;
         #endif 
         if ((n == 0) || ((n == -1) && (nError))) {
-            _io_sock_logfn(_io_sock_fid, 4, "\n Disconnected - reconnecting \n"); 
+            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Disconnected - reconnecting"); 
 			if (s-> connectToRemoteServer == 0) {
                 #ifdef BUILD_FOR_LINUX 
                     close(s-> servsockfd);
