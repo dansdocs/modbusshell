@@ -63,7 +63,7 @@ int main()
 	tmr1 = timers_get_timer(2);      
       
     // Pass in a function to use as a logging function.   
-    timers_setLogFn(&test_logger);
+    timers_setLogFn(&test_logger);  
     
     // get another timer, now that the logFn has been set timers.h should see some output. 
 	tmr2 = timers_get_timer(2);    // 1mS base tick rate. diviser is 2^10 = 100 so update rate is 1mS * 100 = 100mS

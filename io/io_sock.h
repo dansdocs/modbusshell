@@ -39,7 +39,8 @@
       #ifdef BUILD_FOR_WINDOWS      
           WSADATA wsaData;
           unsigned long on; 
-          int iResult;          
+          int iResult; 
+          int nError;         
       #endif        
     } io_sock_s;
     
@@ -72,7 +73,101 @@
     
     #define io_sock_bzero(b,len) (memset((b), '\0', (len)), (void) 0)
 
-   
+    uint8_t io_sock_init(io_sock_s *s, uint16_t port, char *address) {
+        s-> portno = (int) chConfig;        
+        s-> connectToRemoteServer = 0;
+        #ifdef BUILD_FOR_WINDOWS
+            s-> on = 1;
+        #endif
+
+        strcpy(s-> address, adConfig);
+
+        #ifdef BUILD_FOR_WINDOWS 
+            // Initialize Winsock
+            s-> iResult = WSAStartup(MAKEWORD(2,2), &(s-> wsaData));
+            if (s-> iResult != 0) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "WSAStartup failed with error: %d", s-> iResult);
+        #endif  
+        s-> sockfd = socket(AF_INET, SOCK_STREAM, 0);
+        if (s-> sockfd < 0) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR opening socket");
+        io_sock_bzero((char *) &(s-> serv_addr), sizeof(s-> serv_addr));
+        s-> serv_addr.sin_family = AF_INET;
+        s-> serv_addr.sin_port = htons(s-> portno);
+
+        if (s-> address[0] == '\0') {
+            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "No address. Act as server listing on port: %d", s-> portno);
+        }
+        else {
+            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Connecting to server with address %s on port %d", s-> address, s-> portno);
+        }
+    }  
+    
+    uint8_t io_sock_server(io_sock_s *s) {  
+	    s-> connectToRemoteServer = 0;
+        s-> serv_addr.sin_addr.s_addr = INADDR_ANY;
+        if (bind(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr)) < 0) {
+ 	        io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR on binding");
+            #ifdef BUILD_FOR_WINDOWS
+                closesocket(s-> sockfd);
+                WSACleanup();
+            #endif  
+            #ifdef BUILD_FOR_LINUX 
+                close(s-> sockfd);
+            #endif
+            return 0; 
+        }  
+        // 5 is the maximum number of connections (backlog). 
+        if (listen(s-> sockfd, 5) < 0){
+	        io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Socket listen error");
+            #ifdef BUILD_FOR_WINDOWS   
+                closesocket(s-> sockfd);                              
+                WSACleanup();
+            #endif      
+            #ifdef BUILD_FOR_LINUX 
+                close(s-> sockfd);
+            #endif   
+            return 0;                             
+	    }
+        else {
+            // set to non-blocking
+            #ifdef BUILD_FOR_WINDOWS  
+                ioctlsocket(s-> sockfd, FIONBIO, &(s-> on));  
+            #endif   
+            #ifdef BUILD_FOR_LINUX                
+                fcntl(s-> sockfd, F_SETFL, O_NONBLOCK);
+            #endif 
+        }
+    }
+
+    uint8_t io_sock_server_accept(io_sock_s *s) {
+        io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_TRACE, "Before blocking");
+        s-> clilen = sizeof(s-> cli_addr);
+        s -> nError = WSAEWOULDBLOCK;
+        while (s -> nError == WSAEWOULDBLOCK){
+            s -> nError = 0;
+            s-> servsockfd = accept(s-> sockfd, (struct sockaddr *) &(s-> cli_addr), &(s-> clilen));
+            if (s-> servsockfd < 0) {
+	            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR on accept");
+                s -> nError = WSAGetLastError(); 
+                if (s -> nError == WSAEWOULDBLOCK) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Would block");
+                else {
+                     #ifdef BUILD_FOR_WINDOWS                  
+	                    WSACleanup();
+                     #endif
+                }                     
+	        }
+	        else {
+                // set to non-blocking
+                #ifdef BUILD_FOR_WINDOWS  
+                    ioctlsocket(s-> servsockfd, FIONBIO, &(s-> on));  
+                #endif   
+                #ifdef BUILD_FOR_LINUX                
+                    fcntl(s-> servsockfd, F_SETFL, O_NONBLOCK);
+                #endif                     
+            }
+            Sleep(800);
+        }
+        io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_TRACE, "AFTER blocking");	  
+    }     
     
     uint8_t io_sock_initComs(io_sock_s *s, uint16_t chConfig, char *adConfig) {
           
