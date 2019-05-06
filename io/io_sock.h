@@ -15,7 +15,7 @@
         #include <ws2tcpip.h>
     #endif  
     #ifdef BUILD_FOR_LINUX
-        #include <sys/socket.h>
+        #include <sys/socket.h> 
         #include <netinet/in.h>  
         #include <errno.h>     
         #include <string.h>     // strcpy
@@ -74,13 +74,13 @@
     #define io_sock_bzero(b,len) (memset((b), '\0', (len)), (void) 0)
 
     uint8_t io_sock_init(io_sock_s *s, uint16_t port, char *address) {
-        s-> portno = (int) chConfig;        
+        s-> portno = (int) port;        
         s-> connectToRemoteServer = 0;
         #ifdef BUILD_FOR_WINDOWS
             s-> on = 1;
         #endif
 
-        strcpy(s-> address, adConfig);
+        strcpy(s-> address, (const char*) address);
 
         #ifdef BUILD_FOR_WINDOWS 
             // Initialize Winsock
@@ -99,6 +99,7 @@
         else {
             io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Connecting to server with address %s on port %d", s-> address, s-> portno);
         }
+        return 0;
     }  
     
     uint8_t io_sock_server(io_sock_s *s) {  
@@ -136,6 +137,7 @@
                 fcntl(s-> sockfd, F_SETFL, O_NONBLOCK);
             #endif 
         }
+        return 0;
     }
 
     uint8_t io_sock_server_accept(io_sock_s *s) {
@@ -167,6 +169,7 @@
             Sleep(800);
         }
         io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_TRACE, "AFTER blocking");	  
+        return 0;
     }     
     
     uint8_t io_sock_initComs(io_sock_s *s, uint16_t chConfig, char *adConfig) {
