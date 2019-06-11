@@ -59,7 +59,13 @@
 #ifdef IO_SOCK_IMPLEMENTATION
 #undef IO_SOCK_IMPLEMENTATION
 
-    enum {IO_SOCK_START_S, IO_SOCK_ACCEPT_S };
+    enum io_sock_CONNECTSTATES {
+        io_sock_UNINITIALISED, 
+        io_sock_INITSERVER, 
+        io_sock_SERVERCONNECTWAIT, 
+        io_sock_SERVERCONNECTED,
+        io_sock_NULL
+    };
 
    // Infrustructure for logging.  
     #define _IO_SOCK_FID ((uint8_t)(('i' << 2) + 'o' + 's'))
@@ -71,137 +77,25 @@
         io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_INFO, "%02x = io/io_sock.h", _IO_SOCK_FID);    
     }     
     
-    #define io_sock_bzero(b,len) (memset((b), '\0', (len)), (void) 0)
+    #define io_sock_bzero(b,len) (memset((b), '\0', (len)), (void) 0) 
 
-    uint8_t io_sock_init(io_sock_s *s, uint16_t port, char *address) {
-        s-> portno = (int) port;        
-        s-> connectToRemoteServer = 0;
-        #ifdef BUILD_FOR_WINDOWS
-            s-> on = 1;
-        #endif
+    uint8_t _io_sock_initServer(io_sock_s *s) {
 
-        strcpy(s-> address, (const char*) address);
-
-        #ifdef BUILD_FOR_WINDOWS 
-            // Initialize Winsock
-            s-> iResult = WSAStartup(MAKEWORD(2,2), &(s-> wsaData));
-            if (s-> iResult != 0) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "WSAStartup failed with error: %d", s-> iResult);
-        #endif  
-        s-> sockfd = socket(AF_INET, SOCK_STREAM, 0);
-        if (s-> sockfd < 0) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR opening socket");
-        io_sock_bzero((char *) &(s-> serv_addr), sizeof(s-> serv_addr));
-        s-> serv_addr.sin_family = AF_INET;
-        s-> serv_addr.sin_port = htons(s-> portno);
-
-        if (s-> address[0] == '\0') {
-            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "No address. Act as server listing on port: %d", s-> portno);
-        }
-        else {
-            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Connecting to server with address %s on port %d", s-> address, s-> portno);
-        }
-        return 0;
-    }  
-    
-    uint8_t io_sock_server(io_sock_s *s) {  
-	    s-> connectToRemoteServer = 0;
-        s-> serv_addr.sin_addr.s_addr = INADDR_ANY;
-        if (bind(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr)) < 0) {
- 	        io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR on binding");
-            #ifdef BUILD_FOR_WINDOWS
-                closesocket(s-> sockfd);
-                WSACleanup();
+        if(s->state == io_sock_INITSERVER){
+            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_TRACE, "Initialising server");
+             
+            #ifdef BUILD_FOR_WINDOWS 
+                // Initialize Winsock
+                s-> iResult = WSAStartup(MAKEWORD(2,2), &(s-> wsaData));
+                if (s-> iResult != 0) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "WSAStartup failed with error: %d", s-> iResult);
             #endif  
-            #ifdef BUILD_FOR_LINUX 
-                close(s-> sockfd);
-            #endif
-            return 0; 
-        }  
-        // 5 is the maximum number of connections (backlog). 
-        if (listen(s-> sockfd, 5) < 0){
-	        io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Socket listen error");
-            #ifdef BUILD_FOR_WINDOWS   
-                closesocket(s-> sockfd);                              
-                WSACleanup();
-            #endif      
-            #ifdef BUILD_FOR_LINUX 
-                close(s-> sockfd);
-            #endif   
-            return 0;                             
-	    }
-        else {
-            // set to non-blocking
-            #ifdef BUILD_FOR_WINDOWS  
-                ioctlsocket(s-> sockfd, FIONBIO, &(s-> on));  
-            #endif   
-            #ifdef BUILD_FOR_LINUX                
-                fcntl(s-> sockfd, F_SETFL, O_NONBLOCK);
-            #endif 
-        }
-        return 0;
-    }
-
-    uint8_t io_sock_server_accept(io_sock_s *s) {
-        io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_TRACE, "Before blocking");
-        s-> clilen = sizeof(s-> cli_addr);
-        s -> nError = WSAEWOULDBLOCK;
-        while (s -> nError == WSAEWOULDBLOCK){
-            s -> nError = 0;
-            s-> servsockfd = accept(s-> sockfd, (struct sockaddr *) &(s-> cli_addr), &(s-> clilen));
-            if (s-> servsockfd < 0) {
-	            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR on accept");
-                s -> nError = WSAGetLastError(); 
-                if (s -> nError == WSAEWOULDBLOCK) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Would block");
-                else {
-                     #ifdef BUILD_FOR_WINDOWS                  
-	                    WSACleanup();
-                     #endif
-                }                     
-	        }
-	        else {
-                // set to non-blocking
-                #ifdef BUILD_FOR_WINDOWS  
-                    ioctlsocket(s-> servsockfd, FIONBIO, &(s-> on));  
-                #endif   
-                #ifdef BUILD_FOR_LINUX                
-                    fcntl(s-> servsockfd, F_SETFL, O_NONBLOCK);
-                #endif                     
-            }
-            Sleep(800);
-        }
-        io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_TRACE, "AFTER blocking");	  
-        return 0;
-    }     
-    
-    uint8_t io_sock_initComs(io_sock_s *s, uint16_t chConfig, char *adConfig) {
-          
-        s-> portno = (int) chConfig;        
-        s-> connectToRemoteServer = 0;
-        #ifdef BUILD_FOR_WINDOWS
-            s-> on = 1;
-            int nError;
-        #endif
-        
-        strcpy(s-> address, adConfig);      
-        
-        if (s-> address[0] == '\0') io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "No address. Act as server listing on port: %d", s-> portno);
-        else {
-            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Connecting to server with address %s on port %d", s-> address, s-> portno);
-        }
-        
-        #ifdef BUILD_FOR_WINDOWS 
-            // Initialize Winsock
-            s-> iResult = WSAStartup(MAKEWORD(2,2), &(s-> wsaData));
-            if (s-> iResult != 0) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "WSAStartup failed with error: %d", s-> iResult);
-        #endif  
-        s-> sockfd = socket(AF_INET, SOCK_STREAM, 0);
-        if (s-> sockfd < 0) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR opening socket");
-        io_sock_bzero((char *) &(s-> serv_addr), sizeof(s-> serv_addr));
-        s-> serv_addr.sin_family = AF_INET;
-        s-> serv_addr.sin_port = htons(s-> portno);
-
-        // if address is a null string then we don't have server ip address to connect to 
-        // so we are the server and need to listen for an incoming connection.       
-        if (s-> address[0] == '\0'){
+            s-> sockfd = socket(AF_INET, SOCK_STREAM, 0);
+            if (s-> sockfd < 0) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR opening socket");
+            io_sock_bzero((char *) &(s-> serv_addr), sizeof(s-> serv_addr));
+            s-> serv_addr.sin_family = AF_INET;
+            s-> serv_addr.sin_port = htons(s-> portno);
+            
+            // we are the server and need to listen for an incoming connection.       
 		    s-> connectToRemoteServer = 0;
             s-> serv_addr.sin_addr.s_addr = INADDR_ANY;
             if (bind(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr)) < 0) {
@@ -214,8 +108,8 @@
                     close(s-> sockfd);
                 #endif 
             }  
-
-            // 5 is the maximum number of connections (backlog). 
+             
+             // 5 is the maximum number of connections (backlog). 
             if (listen(s-> sockfd, 5) < 0){
 	            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Socket listen error");
                 #ifdef BUILD_FOR_WINDOWS   
@@ -227,6 +121,8 @@
                 #endif                                
 	        }
             else {
+                s->state = io_sock_SERVERCONNECTWAIT;
+                s-> clilen = sizeof(s-> cli_addr);
                 // set to non-blocking
                 #ifdef BUILD_FOR_WINDOWS  
                     ioctlsocket(s-> sockfd, FIONBIO, &(s-> on));  
@@ -235,60 +131,158 @@
                     fcntl(s-> sockfd, F_SETFL, O_NONBLOCK);
                 #endif 
             }
+        }     
 
-            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_TRACE, "Before blocking");
-            s-> clilen = sizeof(s-> cli_addr);
-            nError = WSAEWOULDBLOCK;
-            while (nError == WSAEWOULDBLOCK){
-                nError = 0;
-                s-> servsockfd = accept(s-> sockfd, (struct sockaddr *) &(s-> cli_addr), &(s-> clilen));
-                if (s-> servsockfd < 0) {
-	                io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR on accept");
-                    nError = WSAGetLastError(); 
-                    if (nError == WSAEWOULDBLOCK) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Would block");
-                    else {
-                         #ifdef BUILD_FOR_WINDOWS                  
-		                    WSACleanup();
-                         #endif
-                    }                     
-	            }
-	            else {
-                    // set to non-blocking
-                    #ifdef BUILD_FOR_WINDOWS  
-                        ioctlsocket(s-> servsockfd, FIONBIO, &(s-> on));  
-                    #endif   
-                    #ifdef BUILD_FOR_LINUX                
-                        fcntl(s-> servsockfd, F_SETFL, O_NONBLOCK);
-                    #endif                     
-                }
-                Sleep(800);
-            }
-            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_TRACE, "AFTER blocking");	  
-	    }
-	    else {
-		    // we have an ip address for a server to connect to, so connect to it. 
-		    s-> connectToRemoteServer = 1;
-		    s-> serv_addr.sin_addr.s_addr = inet_addr(s-> address);
-		    if (connect(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr)) != 0 ){
-                io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Connect error when connecting to server");
-                #ifdef BUILD_FOR_WINDOWS   
-                    closesocket(s-> sockfd);              
-                    WSACleanup();
-                #endif  
-                #ifdef BUILD_FOR_LINUX 
-                    close(s-> sockfd);
-                #endif                   
-		    }
-		    else {
+        if(s->state == io_sock_SERVERCONNECTWAIT){
+            s->nError = 0;
+            s-> servsockfd = accept(s-> sockfd, (struct sockaddr *) &(s-> cli_addr), &(s-> clilen));
+            if (s-> servsockfd < 0) {
+	            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR on accept");
+                s->nError = WSAGetLastError(); 
+                if (s->nError == WSAEWOULDBLOCK) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Would block");
+                else {
+                    #ifdef BUILD_FOR_WINDOWS                  
+		                WSACleanup();
+                    #endif
+                }                     
+	        } else {
                 // set to non-blocking
                 #ifdef BUILD_FOR_WINDOWS  
-                    ioctlsocket(s-> sockfd, FIONBIO, &(s-> on));  
+                    ioctlsocket(s-> servsockfd, FIONBIO, &(s-> on));  
                 #endif   
                 #ifdef BUILD_FOR_LINUX                
-                    fcntl(s-> sockfd, F_SETFL, O_NONBLOCK);
+                    fcntl(s-> servsockfd, F_SETFL, O_NONBLOCK);
                 #endif                     
-            } 	  
+            }
+            if (s->nError != WSAEWOULDBLOCK) {
+                s->state = io_sock_SERVERCONNECTED;
+                io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_INFO, "CONECTED %d", s->portno);
+            }
+        }	  
+	    return 0;
+    }
+
+
+    uint8_t io_sock_initComs(io_sock_s *s, uint16_t chConfig, char *adConfig) {
+          
+        s-> portno = (int) chConfig;        
+        s-> connectToRemoteServer = 0;
+        #ifdef BUILD_FOR_WINDOWS
+            s-> on = 1;
+        #endif
+        
+        strcpy(s-> address, adConfig);      
+        
+        if (s-> address[0] == '\0') {
+            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_INFO, "No address, will act as server listing on port: %d", s-> portno);
+            s-> state = io_sock_INITSERVER;
+            _io_sock_initServer(s);
         }
+        else {
+            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_INFO, "Connecting to server with address %s on port %d", s-> address, s-> portno);
+        }
+        
+    //    #ifdef BUILD_FOR_WINDOWS 
+    //        // Initialize Winsock
+    //        s-> iResult = WSAStartup(MAKEWORD(2,2), &(s-> wsaData));
+    //        if (s-> iResult != 0) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "WSAStartup failed with error: %d", s-> iResult);
+    //    #endif  
+    //    s-> sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    //    if (s-> sockfd < 0) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR opening socket");
+    //    io_sock_bzero((char *) &(s-> serv_addr), sizeof(s-> serv_addr));
+    //    s-> serv_addr.sin_family = AF_INET;
+    //    s-> serv_addr.sin_port = htons(s-> portno);
+    //
+    //    // if address is a null string then we don't have server ip address to connect to 
+    //    // so we are the server and need to listen for an incoming connection.       
+    //    if (s-> address[0] == '\0'){
+	//	    s-> connectToRemoteServer = 0;
+    //        s-> serv_addr.sin_addr.s_addr = INADDR_ANY;
+    //        if (bind(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr)) < 0) {
+ 	//            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR on binding");
+    //            #ifdef BUILD_FOR_WINDOWS
+    //                closesocket(s-> sockfd);
+    //                WSACleanup();
+    //            #endif  
+    //            #ifdef BUILD_FOR_LINUX 
+    //                close(s-> sockfd);
+    //            #endif 
+    //        }  
+    //
+    //        // 5 is the maximum number of connections (backlog). 
+    //        if (listen(s-> sockfd, 5) < 0){
+	//            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Socket listen error");
+    //            #ifdef BUILD_FOR_WINDOWS   
+    //                closesocket(s-> sockfd);                              
+    //                WSACleanup();
+    //            #endif      
+    //            #ifdef BUILD_FOR_LINUX 
+    //                close(s-> sockfd);
+    //            #endif                                
+	//        }
+    //        else {
+    //            // set to non-blocking
+    //            #ifdef BUILD_FOR_WINDOWS  
+    //                ioctlsocket(s-> sockfd, FIONBIO, &(s-> on));  
+    //            #endif   
+    //            #ifdef BUILD_FOR_LINUX                
+    //                fcntl(s-> sockfd, F_SETFL, O_NONBLOCK);
+    //            #endif 
+    //        }
+    //
+    //        io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_TRACE, "Before blocking");
+    //        s-> clilen = sizeof(s-> cli_addr);
+    //        nError = WSAEWOULDBLOCK;
+    //        while (nError == WSAEWOULDBLOCK){
+    //            nError = 0;
+    //            s-> servsockfd = accept(s-> sockfd, (struct sockaddr *) &(s-> cli_addr), &(s-> clilen));
+    //            if (s-> servsockfd < 0) {
+	//                io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR on accept");
+    //                nError = WSAGetLastError(); 
+    //                if (nError == WSAEWOULDBLOCK) io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Would block");
+    //                else {
+    //                     #ifdef BUILD_FOR_WINDOWS                  
+	//	                    WSACleanup();
+    //                     #endif
+    //                }                     
+	//            }
+	//            else {
+    //                // set to non-blocking
+    //                #ifdef BUILD_FOR_WINDOWS  
+    //                    ioctlsocket(s-> servsockfd, FIONBIO, &(s-> on));  
+    //                #endif   
+    //                #ifdef BUILD_FOR_LINUX                
+    //                    fcntl(s-> servsockfd, F_SETFL, O_NONBLOCK);
+    //                #endif                     
+    //            }
+    //            Sleep(800);
+    //        }
+    //        io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_TRACE, "AFTER blocking");	  
+	//    }
+	//    else {
+	//	    // we have an ip address for a server to connect to, so connect to it. 
+	//	    s-> connectToRemoteServer = 1;
+	//	    s-> serv_addr.sin_addr.s_addr = inet_addr(s-> address);
+	//	    if (connect(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr)) != 0 ){
+    //            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Connect error when connecting to server");
+    //            #ifdef BUILD_FOR_WINDOWS   
+    //                closesocket(s-> sockfd);              
+    //                WSACleanup();
+    //            #endif  
+    //            #ifdef BUILD_FOR_LINUX 
+    //                close(s-> sockfd);
+    //            #endif                   
+	//	    }
+	//	    else {
+    //            // set to non-blocking
+    //            #ifdef BUILD_FOR_WINDOWS  
+    //                ioctlsocket(s-> sockfd, FIONBIO, &(s-> on));  
+    //            #endif   
+    //            #ifdef BUILD_FOR_LINUX                
+    //                fcntl(s-> sockfd, F_SETFL, O_NONBLOCK);
+    //            #endif                     
+    //        } 	  
+    //    }
 
 	    return 0;
     }
@@ -298,58 +292,58 @@
         int n = 0;
         char rx;
         int nError;
-        static uint8_t first = 1;
-        
-        if (first) {
-            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_WARN, "Connected");
-            first = 0;
-        }
-      
-        if (s-> connectToRemoteServer) n = recv(s-> sockfd, &rx, 1, 0);
-	    else  n = recv(s-> servsockfd, &rx, 1, 0);
-         	  
-	    if (n == -1) {
-            #ifdef BUILD_FOR_WINDOWS 
-                nError = WSAGetLastError(); 
-                if (nError == WSAEWOULDBLOCK) return 0;
-            #endif 
-            #ifdef BUILD_FOR_LINUX
-                if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) return 0;
-            #endif 
-	    }
-	    #ifdef BUILD_FOR_WINDOWS 
-            if (nError != WSAEWOULDBLOCK) nError = 1;
-            else nError = 0;
-        #endif 
-        #ifdef BUILD_FOR_LINUX 
-            if ((errno != EAGAIN) || (errno != EWOULDBLOCK)) nError = 1;
-            else nError = 0;
-        #endif 
-        if ((n == 0) || ((n == -1) && (nError))) {
-            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Disconnected - reconnecting"); 
-			if (s-> connectToRemoteServer == 0) {
-                #ifdef BUILD_FOR_LINUX 
-                    close(s-> servsockfd);
-                #endif 
+     
+        if (s->state == io_sock_SERVERCONNECTWAIT){
+            _io_sock_initServer(s); 
+        } 
+
+        if (s->state == io_sock_SERVERCONNECTED){
+            if (s-> connectToRemoteServer) n = recv(s-> sockfd, &rx, 1, 0);
+	        else  n = recv(s-> servsockfd, &rx, 1, 0);
+             	  
+	        if (n == -1) {
                 #ifdef BUILD_FOR_WINDOWS 
-                    closesocket(s-> servsockfd);
-                #endif    
-            }
-            #ifdef BUILD_FOR_WINDOWS 
-                closesocket(s-> sockfd);
-                WSACleanup();
+                    nError = WSAGetLastError(); 
+                    if (nError == WSAEWOULDBLOCK) return 0;
+                #endif 
+                #ifdef BUILD_FOR_LINUX
+                    if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) return 0;
+                #endif 
+	        }
+	        #ifdef BUILD_FOR_WINDOWS 
+                if (nError != WSAEWOULDBLOCK) nError = 1;
+                else nError = 0;
             #endif 
             #ifdef BUILD_FOR_LINUX 
-                close(s-> sockfd);
+                if ((errno != EAGAIN) || (errno != EWOULDBLOCK)) nError = 1;
+                else nError = 0;
             #endif 
-              
-            io_sock_initComs(s, s-> portno, s-> address);                
-            return 0;
+            if ((n == 0) || ((n == -1) && (nError))) {
+                io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Disconnected - reconnecting"); 
+	    		if (s-> connectToRemoteServer == 0) {
+                    #ifdef BUILD_FOR_LINUX 
+                        close(s-> servsockfd);
+                    #endif 
+                    #ifdef BUILD_FOR_WINDOWS 
+                        closesocket(s-> servsockfd);
+                    #endif    
+                }
+                #ifdef BUILD_FOR_WINDOWS 
+                    closesocket(s-> sockfd);
+                    WSACleanup();
+                #endif 
+                #ifdef BUILD_FOR_LINUX 
+                    close(s-> sockfd);
+                #endif 
+                  
+                io_sock_initComs(s, s-> portno, s-> address);                
+                return 0;
+            }
+            else {
+	    	    *rxByte = (uint8_t)rx;
+	    	    return 1;
+	        }
         }
-        else {
-		    *rxByte = (uint8_t)rx;
-		    return 1;
-	    }
 	    return 0;
     }
   

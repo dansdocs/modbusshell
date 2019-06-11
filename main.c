@@ -12,7 +12,7 @@
 #define IO_IMPLEMENTATION
 #include "./io/io.h"
 
-// componse vprinf by wrapping it with the relevent io
+// compose vprinf by wrapping it with the relevent io
 uint8_t composed_vprintf(va_list vaargs, const char *fmt, ...){
     va_list args; 
     if (vaargs != 0) ucprintf_vprintf(&io_sendByte_mon, fmt, vaargs);
