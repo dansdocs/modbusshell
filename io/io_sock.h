@@ -34,7 +34,7 @@
       socklen_t clilen;
       struct sockaddr_in serv_addr;
       struct sockaddr_in cli_addr;
-      uint8_t connectToRemoteServer;
+      uint8_t actAsServer;
       char address[20];
       #ifdef BUILD_FOR_WINDOWS      
           WSADATA wsaData;
@@ -96,7 +96,7 @@
             s-> serv_addr.sin_port = htons(s-> portno);
             
             // we are the server and need to listen for an incoming connection.       
-		    s-> connectToRemoteServer = 0;
+		    s-> actAsServer = 1;
             s-> serv_addr.sin_addr.s_addr = INADDR_ANY;
             if (bind(s-> sockfd, (struct sockaddr *) &(s-> serv_addr), sizeof(s-> serv_addr)) < 0) {
  	            io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "ERROR on binding");
@@ -166,7 +166,6 @@
     uint8_t io_sock_initComs(io_sock_s *s, uint16_t chConfig, char *adConfig) {
           
         s-> portno = (int) chConfig;        
-        s-> connectToRemoteServer = 0;
         #ifdef BUILD_FOR_WINDOWS
             s-> on = 1;
         #endif
@@ -176,10 +175,12 @@
         if (s-> address[0] == '\0') {
             io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_INFO, "No address, will act as server listing on port: %d", s-> portno);
             s-> state = io_sock_INITSERVER;
+            s-> actAsServer = 1;            
             _io_sock_initServer(s);
         }
         else {
             io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_INFO, "Connecting to server with address %s on port %d", s-> address, s-> portno);
+            s-> actAsServer = 0;
         }
         
     //    #ifdef BUILD_FOR_WINDOWS 
@@ -298,8 +299,8 @@
         } 
 
         if (s->state == io_sock_SERVERCONNECTED){
-            if (s-> connectToRemoteServer) n = recv(s-> sockfd, &rx, 1, 0);
-	        else  n = recv(s-> servsockfd, &rx, 1, 0);
+            if (s-> actAsServer) n = recv(s-> servsockfd, &rx, 1, 0);
+	        else n = recv(s-> sockfd, &rx, 1, 0);
              	  
 	        if (n == -1) {
                 #ifdef BUILD_FOR_WINDOWS 
@@ -320,7 +321,7 @@
             #endif 
             if ((n == 0) || ((n == -1) && (nError))) {
                 io_sock_logFn(_IO_SOCK_FID, IO_SOCK_LOG_ERROR, "Disconnected - reconnecting"); 
-	    		if (s-> connectToRemoteServer == 0) {
+	    		if (s-> actAsServer) {
                     #ifdef BUILD_FOR_LINUX 
                         close(s-> servsockfd);
                     #endif 
@@ -354,8 +355,8 @@
         // this assumes that a closed connection will be addressed by the getByte function being called often
         // it also assumes that data that isn't sent will only be due to a closed connection, not because too
         // much was being sent in one go. 
-        if (s-> connectToRemoteServer) n = send(s-> sockfd, &tx, 1, 0);
-	    else  n = send(s-> servsockfd, &tx, 1, 0);
+        if (s-> actAsServer) n = send(s-> servsockfd, &tx, 1, 0);
+	    else n = send(s-> sockfd, &tx, 1, 0);
 
 	    return (uint8_t) n;
     }
